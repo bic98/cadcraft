@@ -1,18 +1,17 @@
-# PAULGA CAD for Windows: build the installer and publish it to PAULGA's downloads (Cloudflare R2).
+# PAULGA CAD for Windows: build the installer and publish it as a GitHub release of this repository.
 #
-# Runs when a tag `paulga-v<version>` is pushed, or by hand. It publishes:
-#   cad/paulga-cad-<version>-windows-x64.msi
-#   cad/paulga-cad-<version>-windows-x64-portable.zip
-#   cad/latest.json   {version, url, sha256, size, publishedAt}: what PAULGA Studio reads to offer
-#                     the download and, later, an update. Written last, so it never names a file
-#                     that is not there yet.
+# Runs when a tag `paulga-v<version>` is pushed, or by hand. The release `paulga-v<version>` gets:
+#   paulga-cad-<version>-windows-x64.msi
+#   paulga-cad-<version>-windows-x64-portable.zip
+#   latest.json   {version, url, sha256, size, publishedAt}
 #
-# Repository settings this needs:
-#   secrets  R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY   an R2 token that can write the bucket
-#   vars     R2_BUCKET             the bucket's name
-#            DOWNLOADS_BASE_URL    the bucket's public address, no trailing slash
-#   optional WINDOWS_CERTIFICATE / AZURE_* (packaging/windows/sign.ps1); without them the installer
-#            is unsigned and Windows warns about an unknown publisher.
+# PAULGA Studio reads `releases/latest/download/latest.json` to offer the download and, when the
+# installed version is older, the update. The release is published only after every file is on
+# it, so `latest.json` never names an installer that is not there.
+#
+# Optional repository secrets: WINDOWS_CERTIFICATE, WINDOWS_CERTIFICATE_PASSWORD
+# (packaging/windows/sign.ps1). Without them the installer is unsigned and Windows warns about an
+# unknown publisher.
 name: PAULGA release
 
 on:
@@ -21,12 +20,12 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: Publish to the downloads bucket (off: build only, keep the files as a run artifact)
+        description: Publish the release (off builds only and keeps the files as a run artifact)
         type: boolean
         default: false
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: paulga-release
@@ -77,18 +76,7 @@ jobs:
         shell: pwsh
         env:
           VERSION: ${{ steps.version.outputs.version }}
-          DOWNLOADS_BASE_URL: ${{ vars.DOWNLOADS_BASE_URL }}
-        run: |
-          $msi = Get-Item "dist/release/paulga-cad-$env:VERSION-windows-x64.msi"
-          $latest = [ordered]@{
-            version     = $env:VERSION
-            url         = "$env:DOWNLOADS_BASE_URL/cad/$($msi.Name)"
-            sha256      = (Get-FileHash -Algorithm SHA256 -LiteralPath $msi.FullName).Hash.ToLowerInvariant()
-            size        = $msi.Length
-            publishedAt = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
-          }
-          $latest | ConvertTo-Json | Set-Content -LiteralPath dist/release/latest.json -Encoding utf8NoBOM
-          Get-Content dist/release/latest.json
+        run: pwsh packaging/windows/paulga-latest.ps1 -Version $env:VERSION -Repository $env:GITHUB_REPOSITORY
 
       - uses: actions/upload-artifact@v4
         with:
@@ -96,26 +84,10 @@ jobs:
           path: dist/release/
           if-no-files-found: error
 
-      - name: Publish to the downloads bucket
+      - name: Publish the release
         if: env.PUBLISH == 'true'
         shell: pwsh
         env:
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
-          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
-          R2_BUCKET: ${{ vars.R2_BUCKET }}
-          DOWNLOADS_BASE_URL: ${{ vars.DOWNLOADS_BASE_URL }}
-        run: |
-          foreach ($name in 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'R2_BUCKET', 'DOWNLOADS_BASE_URL') {
-            if (-not (Get-Item "env:$name" -ErrorAction SilentlyContinue).Value) { throw "$name is not set for this repository" }
-          }
-          $files = "paulga-cad-$env:VERSION-windows-x64.msi", "paulga-cad-$env:VERSION-windows-x64-portable.zip"
-          foreach ($file in $files) {
-            aws s3 cp "dist/release/$file" "s3://$env:R2_BUCKET/cad/$file" --endpoint-url $env:R2_ENDPOINT
-            if ($LASTEXITCODE -ne 0) { throw "upload of $file failed" }
-          }
-          # Last: Studio reads this, so the installer it names is already there.
-          aws s3 cp dist/release/latest.json "s3://$env:R2_BUCKET/cad/latest.json" --endpoint-url $env:R2_ENDPOINT --cache-control 'no-cache' --content-type 'application/json'
-          if ($LASTEXITCODE -ne 0) { throw 'upload of latest.json failed' }
+        run: pwsh packaging/windows/paulga-publish.ps1 -Version $env:VERSION -Repository $env:GITHUB_REPOSITORY -Target $env:GITHUB_SHA
