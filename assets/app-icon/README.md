@@ -1,5 +1,10 @@
 # App icons
 
+The mark is the PAULGA P with PAULGA CAD's own piece, the bottom-left pill, in red (`#E5484D`); the rest
+is the white P on black. PAULGA Photo colours the middle pill sky blue and PAULGA Vector the right bowl
+orange, so the three programs read as one family and still tell apart in a taskbar (PAULGA Studio draws
+the same marks).
+
 The stable icon is `cadcraft-1024.png` (the padded master). The packaging scripts derive the other
 sizes from it:
 
