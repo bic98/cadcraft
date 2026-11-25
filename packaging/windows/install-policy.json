@@ -1,7 +1,7 @@
 {
   "id": "cadcraft",
-  "name": "CADCraft",
-  "upgradeCode": "119D7D76-0167-4A9E-8F37-09DA0235F68E",
+  "name": "PAULGA CAD",
+  "upgradeCode": "315DA57B-14C0-40DD-9C13-D77960A04B0A",
   "sources": [
     "cadcraft.wxs"
   ],
@@ -12,42 +12,42 @@
   ],
   "payloads": [
     "cadcraft-cli.exe",
-    "cadcraft.exe"
+    "paulga-cad.exe"
   ],
   "registry": [
     [
       "-1",
-      "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\cadcraft.exe",
+      "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\paulga-cad.exe",
       "",
       "[#CadcraftExe]"
     ],
     [
       "-1",
-      "Software\\Classes\\Applications\\cadcraft.exe\\shell\\open\\command",
+      "Software\\Classes\\Applications\\paulga-cad.exe\\shell\\open\\command",
       "",
       "\"[#CadcraftExe]\" \"%1\""
     ],
     [
       "-1",
       "Software\\Classes\\.dxf\\OpenWithProgids",
-      "CADCraft.Drawing",
+      "PaulgaCAD.Drawing",
       ""
     ],
     [
       "-1",
       "Software\\Classes\\.dwg\\OpenWithProgids",
-      "CADCraft.Drawing",
+      "PaulgaCAD.Drawing",
       ""
     ],
     [
       "-1",
-      "Software\\Classes\\CADCraft.Drawing\\shell\\open\\command",
+      "Software\\Classes\\PaulgaCAD.Drawing\\shell\\open\\command",
       "",
       "\"[#CadcraftExe]\" \"%1\""
     ],
     [
       "-1",
-      "Software\\Learning Machines LLC\\CADCraft",
+      "Software\\PAULGA\\PAULGA CAD",
       "DesktopShortcut",
       "1"
     ]

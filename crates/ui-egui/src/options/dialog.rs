@@ -582,10 +582,10 @@ fn preferences(app: &CadApp, ui: &mut egui::Ui, changes: &mut Map<String, Value>
     if !cfg!(target_arch = "wasm32") {
         ui.add_space(6.0);
         let mut check = app.options.check_updates_at_start;
-        if ui.checkbox(&mut check, crate::tl!("Check for updates when CADCraft starts")).changed() {
+        if ui.checkbox(&mut check, crate::tl!("Check for updates when PAULGA CAD starts")).changed() {
             changes.insert("checkUpdatesAtStart".into(), json!(check));
         }
-        hint(ui, crate::tl!("Turned off, CADCraft never offers an update on its own; Help ▸ Check for Updates… still looks."));
+        hint(ui, crate::tl!("Turned off, PAULGA CAD never offers an update on its own; Help ▸ Check for Updates… still looks."));
     }
     ui.ctx().data_mut(|d| d.insert_temp(egui::Id::unique(RIGHT_CLICK), right_click));
 }
@@ -685,7 +685,7 @@ fn right_click_window(o: &super::UiOptions, ctx: &egui::Context, open: &mut bool
 
 fn profiles(app: &CadApp, ui: &mut egui::Ui, changes: &mut Map<String, Value>) {
     ui.label(crate::tl!(
-        "CADCraft keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts."
+        "PAULGA CAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts."
     ));
     ui.add_space(8.0);
     ui.horizontal(|ui| {

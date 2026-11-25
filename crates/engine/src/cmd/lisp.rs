@@ -17,7 +17,7 @@ pub fn specs() -> Vec<CommandSpec> {
             .interactive(|_| Ok(Box::new(ApploadM))),
         CommandSpec::new("lisp", "Evaluate LISP", run_lisp)
             .params(
-                "{code: LISP source, inputs?: [answers to get… calls: numbers, strings, [x,y] points]} → {value (printed as prin1), output: lines printed, error?}",
+                "{code: LISP source, inputs?: [answers to get… calls: numbers, strings, [x,y] points], script?: bool (a script another program sent: only inside the automation roots, it stays in its drawing and leaves no definitions)} → {value (printed as prin1), output: lines printed, error?}",
             )
             .noundo(),
     ]
@@ -83,7 +83,9 @@ fn run_lisp(s: &mut Session, p: &Value) -> Result<Value> {
     let code = str_param(p, "code").ok_or_else(|| bad("lisp", "`code` is required"))?;
     let inputs = p.get("inputs").and_then(Value::as_array).map(|a| a.iter().map(input_value).collect()).unwrap_or_default();
     let from = s.log.len();
-    let r = s.lisp_eval(code, false, true, inputs).map_err(|e| match e {
+    let script = p.get("script").and_then(Value::as_bool).unwrap_or(false);
+    let run = if script { s.lisp_eval_script(code, inputs) } else { s.lisp_eval(code, false, true, inputs) };
+    let r = run.map_err(|e| match e {
         EngineError::Other(m) => bad("lisp", m),
         e => e,
     })?;
@@ -123,5 +125,74 @@ impl Interactive for ApploadM {
             }
             Err(e) => Err(e),
         }
+    }
+}
+
+/// Script mode: a script another program sent, inside the automation roots.
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod script_tests {
+    use crate::file_access::{AutomationRoots, confine};
+    use crate::cmd::file::{EntityCodec, set_entity_codec, set_object_records};
+    use crate::temp_dir::TempDir;
+    use serde_json::{Value, json};
+
+    fn session() -> crate::Session {
+        set_entity_codec(EntityCodec { groups: cadcraft_io::entity_groups, entity: cadcraft_io::entity_from_groups });
+        set_object_records(cadcraft_io::object_records);
+        crate::Session::new()
+    }
+
+    /// Run `code` as a script confined to `dir`.
+    fn script(s: &mut crate::Session, dir: &TempDir, code: &str) -> crate::Result<Value> {
+        let roots = AutomationRoots::new(Some(dir), Some(dir)).unwrap();
+        confine(roots.as_ref(), || s.execute("lisp", &json!({ "code": code, "script": true })))
+    }
+
+    #[test]
+    fn a_script_draws_but_runs_only_inside_the_roots() {
+        let (mut s, dir) = (session(), TempDir::new("script-roots"));
+        let unconfined = s.execute("lisp", &json!({ "code": "(+ 1 2)", "script": true }));
+        assert!(unconfined.is_err(), "no roots in force: refused, not run unconfined");
+        let drawn = script(&mut s, &dir, r#"(command "line" (list 0 0) (list 5 5) "") (+ 1 2)"#).unwrap();
+        assert_eq!(drawn["value"], "3");
+        assert_eq!(s.doc().unwrap().entity_count(), 1);
+    }
+
+    #[test]
+    fn a_script_reaches_no_file_outside_the_roots() {
+        let (mut s, dir) = (session(), TempDir::new("script-files"));
+        let outside = TempDir::new("script-outside");
+        let secret = outside.file("secret.txt", "secret").replace('\\', "/");
+        let read = script(&mut s, &dir, &format!(r#"(open "{secret}" "r")"#)).unwrap();
+        assert_eq!(read["value"], "nil", "a file outside the roots does not open");
+        let target = outside.path_str("written.txt").replace('\\', "/");
+        script(&mut s, &dir, &format!(r#"(setq f (open "{target}" "w")) (if f (progn (write-line "x" f) (close f)))"#)).unwrap();
+        assert!(!outside.join("written.txt").exists());
+        let inside = dir.path_str("note.txt").replace('\\', "/");
+        script(&mut s, &dir, &format!(r#"(setq f (open "{inside}" "w")) (write-line "kept" f) (close f)"#)).unwrap();
+        assert!(dir.join("note.txt").exists(), "its own folder is where it may write");
+    }
+
+    #[test]
+    fn a_script_stays_in_its_drawing() {
+        let (mut s, dir) = (session(), TempDir::new("script-drawing"));
+        let before = s.docs.len();
+        for command in ["new", "close", "closeall"] {
+            let run = script(&mut s, &dir, &format!(r#"(command "{command}")"#)).unwrap();
+            assert_eq!(s.docs.len(), before, "{command}: {run}");
+        }
+        // The same command typed by the person afterwards still works.
+        s.execute("new", &json!({})).unwrap();
+        assert_eq!(s.docs.len(), before + 1);
+    }
+
+    #[test]
+    fn what_a_script_defines_is_gone_when_it_ends() {
+        let (mut s, dir) = (session(), TempDir::new("script-defs"));
+        s.execute("lisp", &json!({ "code": "(setq mine 7)" })).unwrap();
+        script(&mut s, &dir, r#"(defun c:trap () (open "x" "w")) (setq mine 8) (setq theirs 1)"#).unwrap();
+        let after = s.execute("lisp", &json!({ "code": "(list mine theirs c:trap)" })).unwrap();
+        assert_eq!(after["value"], "(7 nil nil)", "the person's variable is back; the script's command and variable are gone");
     }
 }

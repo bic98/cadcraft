@@ -34,7 +34,7 @@
 	A drawing opened from a file keeps that file's format.	En ritning som öppnats från en fil behåller filens format.
 	A variable name starts with a letter and has only letters, digits and _	Ett variabelnamn börjar med en bokstav och innehåller bara bokstäver, siffror och _
 	About	Om
-	About CADCraft	Om CADCraft
+	About PAULGA CAD	Om PAULGA CAD
 	Absolute	Absolut
 	Add Current Scale	Lägg till aktuell skala
 	Add Leader	Lägg till hänvisningslinje
@@ -110,9 +110,9 @@
 	ByBlock	Enligt block
 	ByColor	Enligt färg
 	ByLayer	Enligt lager
-	CADCraft	CADCraft
-	CADCraft Help	Hjälp för CADCraft
-	CADCraft keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	CADCraft sparar de här inställningarna, objektfästena och ritlägena för ditt användarkonto och återställer dem när programmet startar.
+	PAULGA CAD	PAULGA CAD
+	PAULGA CAD Help	Hjälp för PAULGA CAD
+	PAULGA CAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	PAULGA CAD sparar de här inställningarna, objektfästena och ritlägena för ditt användarkonto och återställer dem när programmet startar.
 	Cancel	Avbryt
 	Cartesian (x, y)	Kartesisk (x, y)
 	Center	Centrum
@@ -798,7 +798,7 @@
 	Quick Select Properties	Egenskaper för snabbmarkering
 	Quick Select...	Snabbmarkering...
 	QuickCalc	Snabbkalkyl
-	Quit CADCraft	Avsluta CADCraft
+	Quit PAULGA CAD	Avsluta PAULGA CAD
 	Radius	Radie
 	Raster Image	Rasterbild
 	Ray	Stråle
@@ -1217,7 +1217,7 @@
 @plural	{n} contributor	{n} bidragsgivare|{n} bidragsgivare
 	Drawing as bytes	Ritningen som byte
 	Services	Tjänster
-	Hide CADCraft	Dölj CADCraft
+	Hide PAULGA CAD	Dölj PAULGA CAD
 	Hide Others	Dölj övriga
 	Accessibility	Tillgänglighet
 	Show System Cursor	Visa systemets muspekare
@@ -1447,7 +1447,7 @@ menu	Modify	Ändra
 	Yards	Yard
 	Your changes will be lost if you don't save them.	Dina ändringar går förlorade om du inte sparar dem.
 	Check for Updates…	Sök efter uppdateringar…
-	CADCraft is up to date.	CADCraft är uppdaterat.
+	PAULGA CAD is up to date.	PAULGA CAD är uppdaterat.
 	Could not check for updates.	Det gick inte att söka efter uppdateringar.
 	Add a drawing file as a block library	Lägg till en ritningsfil som blockbibliotek
 	Add a folder of drawings or a drawing file to use its blocks.	Lägg till en mapp med ritningar eller en ritningsfil för att använda dess block.
@@ -1519,10 +1519,10 @@ menu	Modify	Ändra
 	Clip Xref	Beskär xref
 	Xref	Xref
 	Xref Clip Frame	Beskärningsram för xref
-	A shortcut you give wins over CADCraft's own. Changes apply at once and are kept for next time.	Ett kortkommando du anger går före CADCrafts eget. Ändringar gäller direkt och sparas till nästa gång.
+	A shortcut you give wins over PAULGA CAD's own. Changes apply at once and are kept for next time.	Ett kortkommando du anger går före CADCrafts eget. Ändringar gäller direkt och sparas till nästa gång.
 	Alias files (PGP)	Aliasfiler (PGP)
-	Aliases are saved in your CADCraft profile and survive restarts.	Alias sparas i din CADCraft-profil och finns kvar efter omstart.
-	Back to CADCraft's shortcut	Tillbaka till CADCrafts kortkommando
+	Aliases are saved in your PAULGA CAD profile and survive restarts.	Alias sparas i din PAULGA CAD-profil och finns kvar efter omstart.
+	Back to PAULGA CAD's shortcut	Tillbaka till CADCrafts kortkommando
 	Command Mode	Kommandoläge
 	Default Mode	Standardläge
 	Edit Mode	Redigeringsläge

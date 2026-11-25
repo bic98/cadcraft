@@ -53,7 +53,7 @@ pub struct CustomProperty {
     /// The values it may be set to, when it is a choice (visibility states, lookup values, a
     /// distance's list).
     pub choices: Vec<String>,
-    /// CADCraft can change it ([`super::set_property`]): a visibility state, a distance, an angle,
+    /// PAULGA CAD can change it ([`super::set_property`]): a visibility state, a distance, an angle,
     /// a position, a flip state, or a lookup whose tables set only those.
     pub editable: bool,
 }

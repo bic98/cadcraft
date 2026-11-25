@@ -1,5 +1,5 @@
 //! PDFIMPORT: the vector content of a PDF page as editable objects. The PDFs are written here by
-//! hand (a content stream and the standard Helvetica) or by CADCraft's own plotter.
+//! hand (a content stream and the standard Helvetica) or by PAULGA CAD's own plotter.
 
 use cadcraft_color::{Color, Rgb};
 use cadcraft_doc::{Common, Drawing, Entity, EntityKind, HAlign, Line, Lineweight, Space, Text};

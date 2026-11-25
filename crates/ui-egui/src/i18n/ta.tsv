@@ -1,7 +1,7 @@
-# CADCraft Tamil (தமிழ்) interface catalog — original translations.
+# PAULGA CAD Tamil (தமிழ்) interface catalog — original translations.
 # License: MIT OR Apache-2.0 (the repository LICENSE-MIT and LICENSE-APACHE).
-# Written from CADCraft's English strings; no proprietary translations were copied. Most entries
-# come from the Tamil CADCraft and shared catalogs in storytold/craft-i18n (`locales/ta/`); the
+# Written from PAULGA CAD's English strings; no proprietary translations were copied. Most entries
+# come from the Tamil PAULGA CAD and shared catalogs in storytold/craft-i18n (`locales/ta/`); the
 # rest were written for this file the same way.
 # Clean room: every entry is written from the plain meaning of the English label in ordinary
 # Tamil computing and drafting vocabulary (அடுக்கு, தொகுதி, பரிமாணம், கோட்டு நிரப்பு, தளவமைப்பு,
@@ -37,7 +37,7 @@
 	A drawing opened from a file keeps that file's format.	கோப்பிலிருந்து திறந்த வரைபடம் அந்தக் கோப்பின் வடிவமைப்பையே தக்கவைக்கும்.
 	A variable name starts with a letter and has only letters, digits and _	மாறியின் பெயர் ஓர் எழுத்தில் தொடங்கி, எழுத்துகள், இலக்கங்கள் மற்றும் _ மட்டுமே கொண்டிருக்க வேண்டும்
 	About	பற்றி
-	About CADCraft	CADCraft பற்றி
+	About PAULGA CAD	PAULGA CAD பற்றி
 	Absolute	முழுமையானவை
 	Add Current Scale	தற்போதைய அளவுகோலைச் சேர்
 	Add Leader	குறிப்புக்கோட்டைச் சேர்
@@ -113,9 +113,9 @@
 	ByBlock	தொகுதிப்படி
 	ByColor	நிறப்படி
 	ByLayer	அடுக்குப்படி
-	CADCraft	CADCraft
-	CADCraft Help	CADCraft உதவி
-	CADCraft keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	CADCraft இந்த விருப்பங்களையும், பொருள் ஈர்ப்பு முறைகளையும், வரைதல் மாற்றிகளையும் உங்கள் பயனர் கணக்கிற்காகச் சேமித்து, தொடங்கும்போது மீட்டெடுக்கும்.
+	PAULGA CAD	PAULGA CAD
+	PAULGA CAD Help	PAULGA CAD உதவி
+	PAULGA CAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	PAULGA CAD இந்த விருப்பங்களையும், பொருள் ஈர்ப்பு முறைகளையும், வரைதல் மாற்றிகளையும் உங்கள் பயனர் கணக்கிற்காகச் சேமித்து, தொடங்கும்போது மீட்டெடுக்கும்.
 	Cancel	ரத்துசெய்
 	Cartesian (x, y)	கார்ட்டீசியன் (x, y)
 	Center	மையம்
@@ -801,7 +801,7 @@
 	Quick Select Properties	விரைவுத் தேர்வுப் பண்புகள்
 	Quick Select...	விரைவுத் தேர்வு...
 	QuickCalc	விரைவுக் கணிப்பான்
-	Quit CADCraft	CADCraft ஐ விட்டு வெளியேறு
+	Quit PAULGA CAD	PAULGA CAD ஐ விட்டு வெளியேறு
 	Radius	ஆரம்
 	Raster Image	ராஸ்டர் படம்
 	Ray	கதிர்
@@ -1219,7 +1219,7 @@
 @plural	{n} contributor	{n} பங்களிப்பாளர்|{n} பங்களிப்பாளர்கள்
 	Drawing as bytes	பைட்டுகளாக வரைபடம்
 	Services	சேவைகள்
-	Hide CADCraft	CADCraft ஐ மறை
+	Hide PAULGA CAD	PAULGA CAD ஐ மறை
 	Hide Others	மற்றவற்றை மறை
 	Accessibility	அணுகல்தன்மை
 	Show System Cursor	கணினிச் சுட்டியைக் காண்பி
@@ -1441,7 +1441,7 @@
 	Yards	கெஜம்
 	Your changes will be lost if you don't save them.	சேமிக்கவில்லை எனில் உங்கள் மாற்றங்கள் இழக்கப்படும்.
 	Check for Updates…	புதுப்பிப்புகளைச் சரிபார்…
-	CADCraft is up to date.	CADCraft புதுப்பிக்கப்பட்ட நிலையில் உள்ளது.
+	PAULGA CAD is up to date.	PAULGA CAD புதுப்பிக்கப்பட்ட நிலையில் உள்ளது.
 	Could not check for updates.	புதுப்பிப்புகளைச் சரிபார்க்க முடியவில்லை.
 	Find All	அனைத்தையும் தேடு
 	Find what:	தேட வேண்டியது:
@@ -1483,8 +1483,8 @@
 	Replaces the shortcut of {commands}	{commands}-இன் குறுக்குவழிக்குப் பதிலாக அமையும்
 	Needs Ctrl, Alt or a function key	Ctrl, Alt அல்லது ஒரு செயல்பாட்டு விசை தேவை
 	Press the keys	விசைகளை அழுத்தவும்
-	Back to CADCraft's shortcut	CADCraft-இன் குறுக்குவழிக்குத் திரும்பு
-	A shortcut you give wins over CADCraft's own. Changes apply at once and are kept for next time.	நீங்கள் அமைக்கும் குறுக்குவழி CADCraft-இன் சொந்தக் குறுக்குவழியை மீறும். மாற்றங்கள் உடனே செயல்படுத்தப்பட்டு அடுத்த முறைக்காகச் சேமிக்கப்படும்.
+	Back to PAULGA CAD's shortcut	PAULGA CAD-இன் குறுக்குவழிக்குத் திரும்பு
+	A shortcut you give wins over PAULGA CAD's own. Changes apply at once and are kept for next time.	நீங்கள் அமைக்கும் குறுக்குவழி PAULGA CAD-இன் சொந்தக் குறுக்குவழியை மீறும். மாற்றங்கள் உடனே செயல்படுத்தப்பட்டு அடுத்த முறைக்காகச் சேமிக்கப்படும்.
 	Clip Xref	வெளிப்புறக் குறிப்பீட்டைக் கத்தரி
 	Xref Clip Frame	வெளிப்புறக் குறிப்பீட்டுக் கத்தரிச் சட்டகம்
 	Right-Click Customization...	வலது சொடுக்குத் தனிப்பயனாக்கம்...
@@ -1507,7 +1507,7 @@
 	Raster Image Reference...	ராஸ்டர் படக் குறிப்பீடு...
 	Raster Images	ராஸ்டர் படங்கள்
 	DView	DView
-	Aliases are saved in your CADCraft profile and survive restarts.	புனைப்பெயர்கள் உங்கள் CADCraft சுயவிவரத்தில் சேமிக்கப்பட்டு, மறுதொடக்கத்துக்குப் பிறகும் நிலைத்திருக்கும்.
+	Aliases are saved in your PAULGA CAD profile and survive restarts.	புனைப்பெயர்கள் உங்கள் PAULGA CAD சுயவிவரத்தில் சேமிக்கப்பட்டு, மறுதொடக்கத்துக்குப் பிறகும் நிலைத்திருக்கும்.
 	Import…	இறக்குமதி செய்…
 	Import: there is no file dialog here; run ALIASEDIT with the file's contents using its text parameter.	இறக்குமதி: இங்கே கோப்பு உரையாடல் இல்லை; கோப்பின் உள்ளடக்கத்தை ALIASEDIT-இன் text அளவுருவில் கொடுத்து இயக்கவும்.
 	{n} more warnings; see the command line.	மேலும் {n} எச்சரிக்கைகள்; கட்டளை வரியைப் பார்க்கவும்.

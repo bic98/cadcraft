@@ -49,9 +49,9 @@ fn main() {
     }
     let mut res = winresource::WindowsResource::new();
     res.set_icon(build_channel::windows_icon_path(nightly))
-        .set("ProductName", if nightly { "CADCraft Nightly" } else { "CADCraft" })
-        .set("FileDescription", if nightly { "CADCraft Nightly computer-aided design" } else { "CADCraft computer-aided design" })
-        .set("CompanyName", "Learning Machines LLC")
+        .set("ProductName", if nightly { "PAULGA CAD Nightly" } else { "PAULGA CAD" })
+        .set("FileDescription", if nightly { "PAULGA CAD Nightly computer-aided design" } else { "PAULGA CAD computer-aided design" })
+        .set("CompanyName", "PAULGA")
         .set("LegalCopyright", "Copyright (c) 2026 ArtCraft Team and the CADCraft contributors. MIT OR Apache-2.0.")
         .set("OriginalFilename", "cadcraft.exe")
         .set("InternalName", "cadcraft");

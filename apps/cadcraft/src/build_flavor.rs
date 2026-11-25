@@ -12,8 +12,8 @@ pub const COMPILED: BuildFlavor = if cfg!(cadcraft_nightly_v1) { BuildFlavor::Ni
 
 pub fn require_profile(flavor: BuildFlavor, profile: &Profile) -> Result<(), String> {
     match (flavor, profile.is_nightly()) {
-        (BuildFlavor::NightlyV1, false) => Err("Open CADCraft Nightly from ArtCraft Launcher".into()),
-        (BuildFlavor::Stable, true) => Err("This is a stable CADCraft build; nightly-v1 requires the nightly build".into()),
+        (BuildFlavor::NightlyV1, false) => Err("Open PAULGA CAD Nightly from ArtCraft Launcher".into()),
+        (BuildFlavor::Stable, true) => Err("This is a stable PAULGA CAD build; nightly-v1 requires the nightly build".into()),
         _ => Ok(()),
     }
 }

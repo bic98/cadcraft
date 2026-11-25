@@ -340,7 +340,7 @@ impl Collector {
         let mut notes = Vec::new();
         if !self.left_out.is_empty() {
             let list: Vec<String> = self.left_out.iter().map(|(k, n)| k.describe(*n)).collect();
-            notes.push(format!("PDF: CADCraft doesn't import these, so they were left out: {}", list.join(", ")));
+            notes.push(format!("PDF: PAULGA CAD doesn't import these, so they were left out: {}", list.join(", ")));
         }
         if !self.approx.is_empty() {
             let list: Vec<String> = self.approx.iter().map(|(what, n)| format!("{n} {what}")).collect();

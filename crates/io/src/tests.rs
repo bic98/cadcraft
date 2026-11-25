@@ -1463,7 +1463,7 @@ fn file_arrowhead_blocks_with_standard_names_are_kept() {
             assert_eq!(kinds(&back, name), kinds(&d, name), "{what}: {name}");
         }
         let again = write_dxf(&back);
-        assert!(!again.contains("\nSOLID\r"), "{what}: no arrowhead geometry of CADCraft's is written");
+        assert!(!again.contains("\nSOLID\r"), "{what}: no arrowhead geometry of PAULGA CAD's is written");
         assert_eq!(kinds(&roundtrip(&back), "_Dot"), kinds(&d, "_Dot"), "{what}: a second save keeps it too");
     }
 }
@@ -1579,19 +1579,19 @@ fn oversized_dwg_and_dxf_are_rejected_early() {
 fn shared_dwg_diagnostics_keep_cadcraft_vocabulary() {
     assert_eq!(
         cadcraft_dwg_message("DWG: the file is 0.1 MB, larger than the 0.1 MB accepted by this bridge"),
-        "DWG: the file is 0.1 MB, larger than the 0.1 MB CADCraft opens"
+        "DWG: the file is 0.1 MB, larger than the 0.1 MB PAULGA CAD opens"
     );
     assert_eq!(
         cadcraft_dwg_message("DWG: 2 objects of types this bridge can't preserve were left out (FOO × 2)"),
-        "DWG: 2 objects of types CADCraft doesn't keep were left out (FOO × 2)"
+        "DWG: 2 objects of types PAULGA CAD doesn't keep were left out (FOO × 2)"
     );
     assert_eq!(
         cadcraft_dwg_message("DWG version `AC1015` can't be written (this bridge writes AC1018+)"),
-        "DWG version `AC1015` can't be written (CADCraft writes AC1018+)"
+        "DWG version `AC1015` can't be written (PAULGA CAD writes AC1018+)"
     );
     assert_eq!(
         cadcraft_dwg_message("DXF: the input is 1024 MB, larger than the 1024 MB accepted for DWG conversion"),
-        "DXF: the input is 1024 MB, larger than the 1024 MB CADCraft converts to DWG"
+        "DXF: the input is 1024 MB, larger than the 1024 MB PAULGA CAD converts to DWG"
     );
 }
 
@@ -3858,7 +3858,7 @@ fn svg_left_out_content_is_noted() {
     assert_eq!(kinds(&d), ["Polyline", "Polyline"]);
     assert_eq!(
         d.read_notes,
-        ["SVG: CADCraft doesn't read these yet, so they were left out: 2 texts, 1 raster image, 2 `<use>` copies, \
+        ["SVG: PAULGA CAD doesn't read these yet, so they were left out: 2 texts, 1 raster image, 2 `<use>` copies, \
           1 `<style>` sheet (its class rules aren't applied), 1 rectangle with rounded corners (drawn square)"]
     );
     let plain = read(format!("{SVG_PAGE}<rect x=\"1\" y=\"1\" width=\"4\" height=\"3\"/></svg>").as_bytes(), "a.svg").unwrap();
@@ -3966,7 +3966,7 @@ fn svg_too_large_shapes_are_noted_apart_from_unread_content() {
     assert_eq!(
         d.read_notes,
         [
-            "SVG: CADCraft doesn't read these yet, so they were left out: 1 text",
+            "SVG: PAULGA CAD doesn't read these yet, so they were left out: 1 text",
             "SVG: 1 shape was left out as invalid: its coordinates or size are too large to represent"
         ]
     );

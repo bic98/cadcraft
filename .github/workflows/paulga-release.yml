@@ -1,0 +1,121 @@
+# PAULGA CAD for Windows: build the installer and publish it to PAULGA's downloads (Cloudflare R2).
+#
+# Runs when a tag `paulga-v<version>` is pushed, or by hand. It publishes:
+#   cad/paulga-cad-<version>-windows-x64.msi
+#   cad/paulga-cad-<version>-windows-x64-portable.zip
+#   cad/latest.json   {version, url, sha256, size, publishedAt}: what PAULGA Studio reads to offer
+#                     the download and, later, an update. Written last, so it never names a file
+#                     that is not there yet.
+#
+# Repository settings this needs:
+#   secrets  R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY   an R2 token that can write the bucket
+#   vars     R2_BUCKET             the bucket's name
+#            DOWNLOADS_BASE_URL    the bucket's public address, no trailing slash
+#   optional WINDOWS_CERTIFICATE / AZURE_* (packaging/windows/sign.ps1); without them the installer
+#            is unsigned and Windows warns about an unknown publisher.
+name: PAULGA release
+
+on:
+  push:
+    tags: ['paulga-v*']
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish to the downloads bucket (off: build only, keep the files as a run artifact)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paulga-release
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    env:
+      PUBLISH: ${{ github.event_name == 'push' || inputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version
+        id: version
+        shell: pwsh
+        run: |
+          $version = (Select-String -Path Cargo.toml -Pattern '^version\s*=\s*"([^"]+)"' | Select-Object -First 1).Matches[0].Groups[1].Value
+          if (-not $version) { throw 'no [workspace.package] version in Cargo.toml' }
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME -ne "paulga-v$version") {
+            throw "tag $env:GITHUB_REF_NAME does not match Cargo.toml version $version"
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Rust
+        shell: pwsh
+        run: |
+          rustup toolchain install stable --profile minimal --target x86_64-pc-windows-msvc
+          rustup default stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: WiX
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          wix extension add -g WixToolset.UI.wixext/5.0.2
+
+      - name: Build and package
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: pwsh packaging/windows/package.ps1 -Arch x64
+
+      - name: Describe the release
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          DOWNLOADS_BASE_URL: ${{ vars.DOWNLOADS_BASE_URL }}
+        run: |
+          $msi = Get-Item "dist/release/paulga-cad-$env:VERSION-windows-x64.msi"
+          $latest = [ordered]@{
+            version     = $env:VERSION
+            url         = "$env:DOWNLOADS_BASE_URL/cad/$($msi.Name)"
+            sha256      = (Get-FileHash -Algorithm SHA256 -LiteralPath $msi.FullName).Hash.ToLowerInvariant()
+            size        = $msi.Length
+            publishedAt = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+          }
+          $latest | ConvertTo-Json | Set-Content -LiteralPath dist/release/latest.json -Encoding utf8NoBOM
+          Get-Content dist/release/latest.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paulga-cad-${{ steps.version.outputs.version }}-windows-x64
+          path: dist/release/
+          if-no-files-found: error
+
+      - name: Publish to the downloads bucket
+        if: env.PUBLISH == 'true'
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          DOWNLOADS_BASE_URL: ${{ vars.DOWNLOADS_BASE_URL }}
+        run: |
+          foreach ($name in 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'R2_BUCKET', 'DOWNLOADS_BASE_URL') {
+            if (-not (Get-Item "env:$name" -ErrorAction SilentlyContinue).Value) { throw "$name is not set for this repository" }
+          }
+          $files = "paulga-cad-$env:VERSION-windows-x64.msi", "paulga-cad-$env:VERSION-windows-x64-portable.zip"
+          foreach ($file in $files) {
+            aws s3 cp "dist/release/$file" "s3://$env:R2_BUCKET/cad/$file" --endpoint-url $env:R2_ENDPOINT
+            if ($LASTEXITCODE -ne 0) { throw "upload of $file failed" }
+          }
+          # Last: Studio reads this, so the installer it names is already there.
+          aws s3 cp dist/release/latest.json "s3://$env:R2_BUCKET/cad/latest.json" --endpoint-url $env:R2_ENDPOINT --cache-control 'no-cache' --content-type 'application/json'
+          if ($LASTEXITCODE -ne 0) { throw 'upload of latest.json failed' }

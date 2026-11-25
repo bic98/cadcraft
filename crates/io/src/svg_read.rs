@@ -116,7 +116,7 @@ impl Parser {
         let mut notes = Vec::new();
         if !self.left_out.is_empty() {
             let list: Vec<String> = self.left_out.iter().map(|(k, n)| k.describe(*n)).collect();
-            notes.push(format!("SVG: CADCraft doesn't read these yet, so they were left out: {}", list.join(", ")));
+            notes.push(format!("SVG: PAULGA CAD doesn't read these yet, so they were left out: {}", list.join(", ")));
         }
         match self.too_large {
             0 => {}

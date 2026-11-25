@@ -1,4 +1,4 @@
-//! A dimension CADCraft keeps as read (LARGE_RADIAL_DIMENSION, ARC_DIMENSION) draws its `*D`
+//! A dimension PAULGA CAD keeps as read (LARGE_RADIAL_DIMENSION, ARC_DIMENSION) draws its `*D`
 //! block, as AutoCAD does, else the proxy graphics in its AcDbEntity part (#3438); saving keeps
 //! the block, which AutoCAD needs to read the dimension (#1161).
 

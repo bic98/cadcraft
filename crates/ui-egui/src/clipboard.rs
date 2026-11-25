@@ -1,5 +1,5 @@
 //! The system clipboard: Cut/Copy/Paste key presses, and the drawing clipboard mirrored as DXF
-//! text so it can be pasted into another CADCraft window.
+//! text so it can be pasted into another PAULGA CAD window.
 //!
 //! egui turns Cmd/Ctrl+C, X and V into `Copy`, `Cut` and `Paste(text)` events instead of key
 //! presses, so the clipboard shortcuts are read from those. A `Paste` arrives only when the system
@@ -48,7 +48,7 @@ pub enum ShortcutAction {
 }
 
 /// The actions the Cut/Copy/Paste events of this frame ask for. Pasted DXF text that isn't our
-/// own last copy (another CADCraft's) becomes the clipboard first; non-DXF tab-separated table text
+/// own last copy (another PAULGA CAD's) becomes the clipboard first; non-DXF tab-separated table text
 /// starts `pastetable`.
 pub fn shortcut_actions(app: &mut CadApp, ctx: &egui::Context) -> Vec<ShortcutAction> {
     let (events, shift) = ctx.input(|i| {

@@ -124,7 +124,7 @@ fn socket_path(profile: Option<&std::path::Path>) -> Option<std::path::PathBuf> 
     if let Some(root) = profile {
         return Some(root.join("single-instance").join(name));
     }
-    std::env::var_os("LOCALAPPDATA").filter(|v| !v.is_empty()).map(|d| std::path::PathBuf::from(d).join("CADCraft").join(name))
+    std::env::var_os("LOCALAPPDATA").filter(|v| !v.is_empty()).map(|d| std::path::PathBuf::from(d).join("PAULGA CAD").join(name))
 }
 
 /// The socket's file name for a Windows session (`SESSIONNAME`: `Console`, `RDP-Tcp#3`…): a 64-bit
@@ -172,7 +172,7 @@ fn claim_at(path: &std::path::Path, files: &[String], may_hand_off: bool) -> Cla
                 return match hand_off(&stream, files) {
                     Ok(()) => Claim::HandedOff,
                     Err(e) => {
-                        log::warn!("couldn't hand the files to the running CADCraft ({e}); opening a new window");
+                        log::warn!("couldn't hand the files to the running PAULGA CAD ({e}); opening a new window");
                         Claim::Alone
                     }
                 };
@@ -221,7 +221,7 @@ fn hand_off(stream: &uds_windows::UnixStream, files: &[String]) -> std::io::Resu
     writer.write_all(request(files).as_bytes())?;
     let mut reply = String::new();
     std::io::BufReader::new(stream.take(16)).read_line(&mut reply)?;
-    if reply == "ok\n" { Ok(()) } else { Err(std::io::Error::other("the running CADCraft didn't confirm")) }
+    if reply == "ok\n" { Ok(()) } else { Err(std::io::Error::other("the running PAULGA CAD didn't confirm")) }
 }
 
 /// Accept launches on a background thread for as long as the process runs.

@@ -353,7 +353,7 @@ pub fn read_file(path: &std::path::Path) -> std::result::Result<ReadFile, String
             let shown = path.display();
             // The session keeps paths as text; a name that isn't Unicode could never be saved back to.
             let Some(text_path) = path.to_str() else {
-                return Err(bad("open", format!("{shown}: the file name is not valid Unicode, so CADCraft can't save back to it")));
+                return Err(bad("open", format!("{shown}: the file name is not valid Unicode, so PAULGA CAD can't save back to it")));
             };
             crate::file_access::check_read(text_path).map_err(|e| bad("open", e))?;
             let bytes = crate::capped_read::read_capped(path, MAX_DRAWING_BYTES).map_err(|e| bad("open", format!("{shown}: {e}")))?;

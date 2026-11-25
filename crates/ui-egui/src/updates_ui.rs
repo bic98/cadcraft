@@ -57,7 +57,7 @@ pub fn tick(app: &mut CadApp, ctx: &egui::Context) {
     }
     rt.updater.tick(ctx);
     let outcome = match rt.updater.status() {
-        Status::UpToDate => Some(crate::tl!("CADCraft is up to date.")),
+        Status::UpToDate => Some(crate::tl!("PAULGA CAD is up to date.")),
         Status::Failed(_) => Some(crate::tl!("Could not check for updates.")),
         Status::Idle | Status::Checking | Status::Installing | Status::Ready | Status::Managed | Status::Updated(_) | Status::InstallFailed(_) => {
             None

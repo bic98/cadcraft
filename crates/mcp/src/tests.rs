@@ -418,7 +418,7 @@ fn legacy_protocol_routing_and_version_negotiation() {
     {
         let response = call(&mut s, 1, "initialize", params);
         assert_eq!(response["result"]["protocolVersion"], expected);
-        assert_eq!(response["result"]["serverInfo"]["title"], "CADCraft");
+        assert_eq!(response["result"]["serverInfo"]["title"], "PAULGA CAD");
         assert!(response["result"]["instructions"].as_str().unwrap().contains("Backend:"));
     }
     let response: Value =

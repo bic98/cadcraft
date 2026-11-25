@@ -43,6 +43,7 @@ mod line_editor;
 mod mtext_editor;
 mod panel_state;
 pub mod spacemouse;
+pub mod studio;
 pub mod switch;
 // The Edit Text window, opened from the shortcut menu's Edit Text entry.
 pub mod textdlg;
@@ -312,7 +313,9 @@ pub struct CadApp {
     /// Drawings being read on worker threads ([`opening`]).
     pub opening: opening::Opening,
     pub integrated_titlebar: bool,
-    control_rx: Option<Receiver<ControlRequest>>,
+    control_rx: Vec<Receiver<ControlRequest>>,
+    /// The PAULGA Studio connection the host attached ([`studio`]); `None` where there is none.
+    pub studio: Option<std::sync::Arc<studio::Link>>,
     /// Fresh surface and identity snapshot (see [`capture`]).
     pub(crate) capture_geometry: Option<capture::CaptureGeometry>,
     /// Monotonic surface epoch, bumped whenever the window/viewport geometry changes.
@@ -413,7 +416,8 @@ impl CadApp {
             status: None,
             opening: opening::Opening::default(),
             integrated_titlebar: false,
-            control_rx: None,
+            control_rx: Vec::new(),
+            studio: None,
             capture_geometry: None,
             capture_epoch: 0,
             capture_identity_epoch: 0,
@@ -603,7 +607,13 @@ impl CadApp {
     }
 
     pub fn with_control(mut self, rx: Receiver<ControlRequest>) -> Self {
-        self.control_rx = Some(rx);
+        self.control_rx.push(rx);
+        self
+    }
+
+    /// Attach the host's PAULGA Studio connection, so the panel and `studio.*` commands reach it.
+    pub fn with_studio(mut self, link: std::sync::Arc<studio::Link>) -> Self {
+        self.studio = Some(link);
         self
     }
 
@@ -736,6 +746,9 @@ impl CadApp {
             "saveVersion": self.ui.save_version,
             "quickcalc": self.quickcalc.prefs(),
         });
+        if let Some(link) = &self.studio {
+            prefs["studioConnect"] = json!(link.snapshot().wanted);
+        }
         if self.spacemouse.settings != spacemouse::Settings::default() {
             prefs["spacemouse"] = json!(self.spacemouse.settings);
         }
@@ -925,7 +938,7 @@ impl CadApp {
     pub fn open_size_error(name: &str, len: u64) -> Option<String> {
         (len > Self::MAX_OPEN_BYTES).then(|| {
             format!(
-                "Open: {name} is {:.1} MB, larger than the {} MB CADCraft opens in the browser",
+                "Open: {name} is {:.1} MB, larger than the {} MB PAULGA CAD opens in the browser",
                 len as f64 / 1048576.0,
                 Self::MAX_OPEN_BYTES >> 20
             )
@@ -999,6 +1012,7 @@ impl CadApp {
         // Consume-based queues: each item is handled once, whichever callback delivers it. A
         // reply arriving during a later pass is never starved until the next frame.
         self.drain_control(ctx);
+        studio::frame(self);
         self.finish_pick(ctx);
         self.finish_opening();
         // Finishing an open switches to the new drawing.
@@ -1249,8 +1263,8 @@ impl CadApp {
 
     /// Drain each queued control request at most once (timed-out requests are skipped), dispatch it to `control::handle` or `capture::admit`, note the resulting capture identity and request a repaint.
     fn drain_control(&mut self, ctx: &egui::Context) {
-        let Some(rx) = self.control_rx.take() else { return };
-        while let Ok(req) = rx.try_recv() {
+        let receivers = std::mem::take(&mut self.control_rx);
+        for req in receivers.iter().flat_map(Receiver::try_iter) {
             // Timed out while queued: the client was told it did not run (#345).
             if !req.begin() {
                 continue;
@@ -1267,7 +1281,7 @@ impl CadApp {
             capture::note_identity(self, ctx);
             ctx.request_repaint();
         }
-        self.control_rx = Some(rx);
+        self.control_rx = receivers;
     }
 }
 
@@ -1521,7 +1535,7 @@ mod tests {
     #[test]
     fn default_save_format_persists_and_names_new_drawings() {
         let mut a = app();
-        assert_eq!(a.ui.save_format, SaveFormat::Dxf, "default keeps DXF, CADCraft's native format");
+        assert_eq!(a.ui.save_format, SaveFormat::Dxf, "default keeps DXF, PAULGA CAD's native format");
         assert!(a.run("ui.saveformat", json!({ "format": "pdf" })).is_err());
         assert_eq!(a.run("ui.saveformat", json!({ "format": "DWG" })).ok(), Some(json!({ "saveFormat": "dwg" })));
         assert_eq!(a.run("ui.saveformat", json!({})).ok(), Some(json!({ "saveFormat": "dwg" })), "no format: report it");

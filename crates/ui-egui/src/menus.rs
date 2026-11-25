@@ -91,6 +91,12 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.panel.layers", "Layers Palette", &["Window", "Layers Palette"], None),
     ("ui.toggle.quickcalc", "QuickCalc", &["Window", "QuickCalc"], Some("Cmd+8")),
     ("ui.panel.quickcalc", "QuickCalc", &[], None),
+    ("ui.toggle.studio", "PAULGA Studio", &["Window", "PAULGA Studio"], None),
+    ("ui.panel.studio", "PAULGA Studio", &[], None),
+    ("studio.connect", "Connect to PAULGA Studio", &[], None),
+    ("studio.disconnect", "Disconnect from PAULGA Studio", &[], None),
+    ("studio.status", "PAULGA Studio Connection Status", &[], None),
+    ("studio.tool", "Run a PAULGA Studio Tool", &[], None),
     ("ui.toggle.systemcursor", "Show System Cursor", &["View", "Accessibility", "Show System Cursor"], None),
     ("ui.animations.system", "Use System Setting", &["View", "Accessibility", "Animation Effects", "Use System Setting"], None),
     ("ui.animations.on", "On", &["View", "Accessibility", "Animation Effects", "On"], None),
@@ -126,10 +132,8 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.dialog.qselect", "Quick Select...", &[], None),
     ("ui.dialog.parameters", "Parameters Manager", &["Window", "Parameters Manager"], None),
     ("ui.dialog.dsettings", "Drafting Settings...", &[], None),
-    #[cfg(not(target_arch = "wasm32"))]
-    ("ui.updates.check", "Check for Updates…", &["Help", "Check for Updates…"], None),
-    ("ui.dialog.about", "About CADCraft", &["Help", "About CADCraft"], None),
-    ("ui.dialog.commands", "Command Reference", &["Help", "CADCraft Help"], Some("F1")),
+    ("ui.dialog.about", "About PAULGA CAD", &["Help", "About PAULGA CAD"], None),
+    ("ui.dialog.commands", "Command Reference", &["Help", "PAULGA CAD Help"], Some("F1")),
     ("ui.toggle.history", "Command History", &["Window", "Command History"], Some("F2")),
     ("ui.cmdline.lines", "Command Line History Lines", &[], None),
     ("ui.cmdline.clear", "Clear Command History", &[], None),
@@ -138,7 +142,7 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.shortcuts", "Keyboard Shortcuts...", &["Tools", "Customize", "Keyboard Shortcuts..."], None),
     ("ui.language", "Language", &[], None),
     ("ui.noop", "", &[], None),
-    ("ui.quit", "Quit CADCraft", &[], Some("Cmd+Q")),
+    ("ui.quit", "Quit PAULGA CAD", &[], Some("Cmd+Q")),
 ];
 
 pub fn is_ui_command(id: &str) -> bool {
@@ -185,6 +189,9 @@ fn route_ui_subsystems(app: &mut CadApp, id: &str, params: &Value) -> Option<Res
     // Explicit opens remain idempotent; typed QUICKCALC with JSON parameters uses the engine's CAL alias.
     if id == "ui.panel.quickcalc" || (matches!(id, "quickcalc" | "qc") && params.is_null()) {
         return Some(crate::palettes::quickcalc::open(app));
+    }
+    if let Some(r) = crate::studio::route(app, id, params) {
+        return Some(r);
     }
     if let Some(r) = crate::plotstyles::route(app, id, params) {
         return Some(r);
@@ -557,8 +564,7 @@ fn run_ui_command_inner(app: &mut CadApp, id: &str, params: &Value) -> Option<Re
         }
         #[cfg(not(target_arch = "wasm32"))]
         "ui.updates.check" => {
-            crate::updates_ui::check_now(app);
-            Ok(Value::Null)
+            Err("PAULGA CAD updates are managed separately.".into())
         }
         "ui.dialog.close" => {
             app.ui.dialog = None;
@@ -845,7 +851,7 @@ fn switch_on_hover(ctx: &egui::Context, titles: &[egui::Response]) {
 /// palette when it is open (typed XREF only opens it); other items clear pending command-line
 /// text and start their command interactively.
 pub fn activate(app: &mut CadApp, id: &str) {
-    if id == "ui.toggle.quickcalc" {
+    if matches!(id, "ui.toggle.quickcalc" | "ui.toggle.studio") {
         run_transparent(app, id);
         return;
     }

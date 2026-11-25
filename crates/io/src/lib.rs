@@ -1,10 +1,10 @@
-//! CADCraft file formats: DXF/DWG read, SVG/SVGZ import, PDF page conversion and SVG/PNG/PDF plotting.
+//! PAULGA CAD file formats: DXF/DWG read, SVG/SVGZ import, PDF page conversion and SVG/PNG/PDF plotting.
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 #![forbid(unsafe_code)]
 
 /// A DWG hatch's elliptic boundary edge angles, in degrees in the DXF the DWG is read through (#3332).
 mod dwg_hatch;
-/// What a DXF file holds that CADCraft doesn't model, kept and written back (#528).
+/// What a DXF file holds that PAULGA CAD doesn't model, kept and written back (#528).
 mod dxf_raw;
 
 /// XCLIP boundaries as SPATIAL_FILTER objects.
@@ -51,7 +51,7 @@ pub struct SaveOptions {
 }
 
 /// The version a drawing is saved in when none is asked for: the version of the file it was
-/// read from (`$ACADVER`, the nearest one CADCraft writes), and 2018 for a new drawing.
+/// read from (`$ACADVER`, the nearest one PAULGA CAD writes), and 2018 for a new drawing.
 pub fn save_version(d: &Drawing) -> Version {
     d.header.get("ACADVER").and_then(cadcraft_doc::HVal::as_str).and_then(Version::for_acadver).unwrap_or_default()
 }
@@ -66,13 +66,13 @@ pub enum IoError {
 
 pub type Result<T> = std::result::Result<T, IoError>;
 
-/// Restore CADCraft's public diagnostics after the shared byte bridge supplies generic wording.
+/// Restore PAULGA CAD's public diagnostics after the shared byte bridge supplies generic wording.
 fn cadcraft_dwg_message(message: &str) -> String {
     message
-        .replace("accepted by this bridge", "CADCraft opens")
-        .replace("types this bridge can't preserve", "types CADCraft doesn't keep")
-        .replace("this bridge writes", "CADCraft writes")
-        .replace("accepted for DWG conversion", "CADCraft converts to DWG")
+        .replace("accepted by this bridge", "PAULGA CAD opens")
+        .replace("types this bridge can't preserve", "types PAULGA CAD doesn't keep")
+        .replace("this bridge writes", "PAULGA CAD writes")
+        .replace("accepted for DWG conversion", "PAULGA CAD converts to DWG")
 }
 
 fn dwg_error(message: String) -> IoError {
@@ -161,7 +161,7 @@ pub fn write_noted(d: &Drawing, name: impl AsRef<Path>, opts: &SaveOptions) -> R
 }
 
 /// The DWG bridge reads our R2000 DXF and writes the DWG at `version`, in the DWG worker when
-/// there is one. The objects CADCraft keeps without modelling them are still in the groups of the
+/// there is one. The objects PAULGA CAD keeps without modelling them are still in the groups of the
 /// file they came from (`Foreign::version`, not `$ACADVER`, which SAVEAS changes), and the bridge
 /// reads them as that version.
 fn write_dwg(d: &Drawing, version: Version) -> Result<(Vec<u8>, craft_dwg::Unwritten)> {

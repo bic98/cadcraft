@@ -72,8 +72,8 @@ pub fn title_and_toolbar(app: &mut CadApp, ui: &mut egui::Ui) {
             // The empty row moves the window; it goes first so later widgets take their own clicks.
             craft_window::title_bar::empty_area(ui, Rect::from_min_size(r.min, vec2(r.width(), title_h)));
             let title = match app.session.state() {
-                Ok(st) if !app.ui.start_tab => format!("CADCraft      {}{}", st.title, if st.title.contains('.') { "" } else { ".dwg" }),
-                _ => format!("CADCraft      {}", crate::tl!("Start")),
+                Ok(st) if !app.ui.start_tab => format!("PAULGA CAD      {}{}", st.title, if st.title.contains('.') { "" } else { ".dwg" }),
+                _ => format!("PAULGA CAD      {}", crate::tl!("Start")),
             };
             // Centred on the traffic lights' centre line (the row's middle): with the system font
             // the capitals' middle is the text box's middle, so no optical nudge.
@@ -536,13 +536,19 @@ pub fn start_page(app: &mut CadApp, ui: &mut egui::Ui) {
     let left = Rect::from_min_size(r.min, vec2(300.0, r.height()));
     p.rect_filled(left, 0.0, t.chrome_dark);
     p.rect_filled(Rect::from_min_max(pos2(left.right(), r.top()), r.max), 0.0, t.chrome);
-    p.text(
-        pos2(left.left() + 34.0, left.top() + 70.0),
-        egui::Align2::LEFT_CENTER,
-        crate::os_window::drawn_name(),
-        egui::FontId::proportional(28.0),
-        t.text,
-    );
+    let mark_id = egui::Id::unique("paulga-start-mark");
+    let mark = ui.ctx().data(|data| data.get_temp::<egui::TextureHandle>(mark_id)).or_else(|| {
+        let rgba = image::load_from_memory(include_bytes!("../../../assets/app-icon/cadcraft-64.png")).ok()?.to_rgba8();
+        let image = egui::ColorImage::from_rgba_unmultiplied([64, 64], &rgba);
+        let texture = ui.ctx().load_texture("paulga-mark", image, egui::TextureOptions::LINEAR);
+        ui.ctx().data_mut(|data| data.insert_temp(mark_id, texture.clone()));
+        Some(texture)
+    });
+    if let Some(mark) = mark {
+        let rect = Rect::from_min_size(left.min + vec2(34.0, 53.0), vec2(34.0, 34.0));
+        p.image(mark.id(), rect, Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), egui::Color32::WHITE);
+    }
+    p.text(pos2(left.left() + 77.0, left.top() + 70.0), egui::Align2::LEFT_CENTER, crate::os_window::drawn_name(), egui::FontId::proportional(28.0), t.text);
     p.text(
         pos2(left.left() + 34.0, left.top() + 98.0),
         egui::Align2::LEFT_CENTER,

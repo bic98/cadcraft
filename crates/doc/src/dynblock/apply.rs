@@ -249,7 +249,7 @@ impl Plan {
     /// units; angles in radians, as AutoCAD writes them).
     fn cell(&mut self, m: &DynamicBlock, values: &BTreeMap<i32, Value>, node: i32, property: &str, cell: &str) -> Result<(), String> {
         let p = m.parameters.iter().find(|p| p.node == node).ok_or("A lookup table refers to a missing parameter.")?;
-        let col = column(&p.kind, property).ok_or_else(|| format!("A lookup table sets {property}, which CADCraft can't change yet."))?;
+        let col = column(&p.kind, property).ok_or_else(|| format!("A lookup table sets {property}, which PAULGA CAD can't change yet."))?;
         if col == Column::Text {
             self.set.insert(node, Val::Text(cell.to_string()));
             return Ok(());
@@ -543,7 +543,7 @@ pub fn set_property(d: &mut Drawing, insert: Handle, name: &str, value: &str) ->
             }
             plan.chain(&m, &r.values, p.node)?;
         }
-        _ => return Err(format!("CADCraft can't change {name} yet.")),
+        _ => return Err(format!("PAULGA CAD can't change {name} yet.")),
     }
     apply(d, insert, &r.definition, &r.values, &plan.set, p.node)
 }

@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use cadcraft_mcp::args::{blank_env_is_unset, name_env_vars};
 use clap::{Command, CommandFactory, FromArgMatches, Parser};
 
-/// Opens CADCraft with the given files
+/// Opens PAULGA CAD with the given files
 #[derive(Parser)]
 #[command(name = "cadcraft", version = cadcraft_engine::build_version(), after_help = crate::env::help())]
 pub(crate) struct LaunchArgs {
@@ -24,7 +24,7 @@ pub(crate) struct LaunchArgs {
     /// Open with the sample drawing
     #[arg(long)]
     pub(crate) sample: bool,
-    /// Open the files in a new window, even if CADCraft is already running (Windows)
+    /// Open the files in a new window, even if PAULGA CAD is already running (Windows)
     #[arg(long)]
     pub(crate) new_window: bool,
 }

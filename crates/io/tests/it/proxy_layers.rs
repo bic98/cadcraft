@@ -1,6 +1,6 @@
 //! Proxy graphics name layers by their index in the file's LAYER table (#3094). AutoCAD keeps
 //! layers that only proxy graphics use, but saves the graphics with their old indices after
-//! PURGE removed a layer before them, which moves the graphics to other layers; CADCraft turns the
+//! PURGE removed a layer before them, which moves the graphics to other layers; PAULGA CAD turns the
 //! indices into the written table's on save.
 
 use cadcraft_doc::{EntityKind, Unknown};
@@ -98,7 +98,7 @@ fn indices_resolve_in_the_files_table_and_one_past_it_keeps_the_layer() {
 }
 
 /// AutoCAD's PURGE removes A_LEER and Defpoints and keeps the two layers the graphics use; saved
-/// as AutoCAD saves it, indices 3 and 4 would point past the three-entry table. CADCraft writes
+/// as AutoCAD saves it, indices 3 and 4 would point past the three-entry table. PAULGA CAD writes
 /// them as 1 and 2.
 #[test]
 fn removing_a_layer_before_the_ones_the_graphics_use_keeps_them_on_save() {

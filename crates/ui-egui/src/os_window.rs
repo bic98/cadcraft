@@ -1,4 +1,4 @@
-//! The app id and the channel name every CADCraft OS window and caption carries, plus the
+//! The app id and the channel name every PAULGA CAD OS window and caption carries, plus the
 //! startup identity the desktop selects before any UI service exists.
 //!
 //! The identity is immutable once selected: a stable build and a nightly build never share a
@@ -44,8 +44,8 @@ pub fn app_id() -> &'static str {
 
 pub const fn name_for(identity: LaunchIdentity) -> &'static str {
     match identity {
-        LaunchIdentity::Stable => "CADCraft",
-        LaunchIdentity::NightlyV1 => "CADCraft Nightly",
+        LaunchIdentity::Stable => "PAULGA CAD",
+        LaunchIdentity::NightlyV1 => "PAULGA CAD Nightly",
     }
 }
 
@@ -71,8 +71,8 @@ mod tests {
     fn nightly_identity_is_distinct_and_never_enables_stable_services() {
         assert_eq!(id_for(LaunchIdentity::Stable), APP_ID);
         assert_ne!(id_for(LaunchIdentity::NightlyV1), APP_ID);
-        assert_eq!(name_for(LaunchIdentity::Stable), "CADCraft");
-        assert_eq!(name_for(LaunchIdentity::NightlyV1), "CADCraft Nightly");
+        assert_eq!(name_for(LaunchIdentity::Stable), "PAULGA CAD");
+        assert_eq!(name_for(LaunchIdentity::NightlyV1), "PAULGA CAD Nightly");
         assert!(stable_services_for(LaunchIdentity::Stable));
         assert!(!stable_services_for(LaunchIdentity::NightlyV1));
     }

@@ -297,7 +297,7 @@ fn read_budgeted(bytes: &[u8], mut table_cells_left: usize, curve_points: usize)
         let n = rx.curves.cut;
         let which = if n == 1 { "hatch has" } else { "hatches have" };
         d.read_notes.push(format!(
-            "DXF: {n} {which} more boundary curve points than CADCraft reads from one file; past that, elliptic and spline edges were read coarsely."
+            "DXF: {n} {which} more boundary curve points than PAULGA CAD reads from one file; past that, elliptic and spline edges were read coarsely."
         ));
     }
     d.skipped_records = skipped;

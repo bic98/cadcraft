@@ -1,4 +1,4 @@
-//! CADCraft desktop app.
+//! PAULGA CAD desktop app.
 //!
 //! Usage: `cadcraft [--control <port>] [--sample] [--new-window] [files…]` (`cadcraft --help` lists the rest; see [`launch_args`])
 //!
@@ -20,6 +20,8 @@ mod apple_events;
 mod build_channel;
 mod build_flavor;
 mod control_server;
+#[cfg(windows)]
+mod paulga_studio;
 mod desktop_theme;
 mod env;
 #[cfg(any(target_os = "windows", test))]
@@ -54,7 +56,7 @@ struct App {
     system_animations: system_animations::SystemAnimations,
     workspace: workspace::Workspace,
     workspace_error: Option<String>,
-    /// The first CADCraft of this sign-in: files that later launches hand over (Windows).
+    /// The first PAULGA CAD of this sign-in: files that later launches hand over (Windows).
     single_instance: Option<single_instance::Server>,
     #[cfg(target_os = "macos")]
     native_menu: Option<native_menu::NativeMenu>,
@@ -82,7 +84,7 @@ impl App {
         };
         if let Err(error) = result {
             if self.workspace_error.as_ref() != Some(&error) {
-                eprintln!("CADCraft workspace: {error}");
+                eprintln!("PAULGA CAD workspace: {error}");
                 self.cad.set_status(format!("Workspace could not be saved: {error}"));
                 self.workspace_error = Some(error);
             }
@@ -320,7 +322,7 @@ fn window_options(restoring: bool, stencil: u8) -> eframe::NativeOptions {
         // (#1129); later launches go back where the window was (eframe would centre over that).
         // Wayland compositors place windows themselves.
         centered: !restoring,
-        // CADCraft installs its own capped font chain (`theme::install_fonts`); never run
+        // PAULGA CAD installs its own capped font chain (`theme::install_fonts`); never run
         // system-font discovery as a hidden fallback.
         system_font_fallback: false,
         // A stencil buffer clips the contents of clipped layout viewports on the GPU.
@@ -365,7 +367,7 @@ fn version_string() -> String {
 /// The Nightly identity line every nightly script checks: `<App> <version> (nightly-v1)`, with the
 /// prepared nightly version embedded at build time. The app name never gains a "Nightly".
 fn nightly_version_line() -> String {
-    format!("CADCraft {}", build_flavor::version(build_flavor::BuildFlavor::NightlyV1, built_version()))
+    format!("PAULGA CAD {}", build_flavor::version(build_flavor::BuildFlavor::NightlyV1, built_version()))
 }
 
 /// The identity this build reports in its log: the Nightly line on that channel, stable's otherwise.
@@ -393,13 +395,13 @@ fn initialize_nightly_process_identity() -> Result<(), process_identity::Identit
 /// A refused launch profile ends with a native dialog on a desktop, and with the reason on standard
 /// error everywhere else (a headless runner must never wait for a modal).
 fn report_launch_profile_error(error: &str) {
-    eprintln!("CADCraft launch profile: {error}");
+    eprintln!("PAULGA CAD launch profile: {error}");
     let desktop_session = cfg!(windows)
         || cfg!(target_os = "macos")
         || (cfg!(target_os = "linux") && ["DISPLAY", "WAYLAND_DISPLAY"].into_iter().any(|key| std::env::var_os(key).is_some_and(|v| !v.is_empty())));
     if build_flavor::needs_native_error(build_flavor::COMPILED, desktop_session) {
         if let Err(error) = initialize_nightly_process_identity() {
-            eprintln!("CADCraft launch profile: {error}");
+            eprintln!("PAULGA CAD launch profile: {error}");
             return;
         }
         let _ = rfd::MessageDialog::new()
@@ -465,7 +467,7 @@ fn main() -> eframe::Result {
         && let Some(done) = craft_update::self_update::finish(&cadcraft_ui_egui::UPDATE_APP, &arguments)
     {
         if let Err(e) = done {
-            eprintln!("CADCraft update helper failed: {e}");
+            eprintln!("PAULGA CAD update helper failed: {e}");
             std::process::exit(1);
         }
         return Ok(());
@@ -481,7 +483,7 @@ fn main() -> eframe::Result {
     // the nightly profile is not part of the protocol.
     let control_port = if is_nightly() {
         if control_port.is_some() {
-            eprintln!("CADCraft Nightly: the control server is off in this channel; the option is ignored");
+            eprintln!("PAULGA CAD Nightly: the control server is off in this channel; the option is ignored");
         }
         None
     } else {
@@ -499,7 +501,7 @@ fn main() -> eframe::Result {
             }
         }
     }
-    // A launch that only names files hands them to the CADCraft already running and exits.
+    // A launch that only names files hands them to the PAULGA CAD already running and exits.
     let handed = single_instance::absolute(&files);
     let may_hand_off = handed.is_some() && !launch.new_window && !files.is_empty() && control_port.is_none() && !sample;
     let instance = match single_instance::claim(handed.as_deref().unwrap_or_default(), may_hand_off, launch_profile::current().root()) {
@@ -515,7 +517,7 @@ fn main() -> eframe::Result {
         match nightly_session::Session::begin_with_health(launch_profile::current().root(), built_version(), option_env!("CADCRAFT_BUILD_SHA")) {
             Ok((watch, unavailable)) => {
                 if unavailable {
-                    log::warn!("another CADCraft Nightly holds this profile's session lease; this window keeps no health record");
+                    log::warn!("another PAULGA CAD Nightly holds this profile's session lease; this window keeps no health record");
                 }
                 let unclean = watch.as_ref().is_some_and(nightly_session::Session::previous_unclean);
                 (std::sync::Arc::new(std::sync::Mutex::new(watch)), unclean)
@@ -526,7 +528,7 @@ fn main() -> eframe::Result {
             }
         };
     if previous_unclean {
-        log::warn!("the previous CADCraft Nightly ended without finishing its session record");
+        log::warn!("the previous PAULGA CAD Nightly ended without finishing its session record");
     }
     if let Some(dir) = &vars.config_dir {
         cadcraft_ui_egui::fault::install_report_hook(dir.join(cadcraft_ui_egui::fault::REPORT_DIR));
@@ -582,7 +584,7 @@ fn main() -> eframe::Result {
             b.with_x11();
         }));
     }
-    // macOS: Quit CADCraft (Cmd+Q), the Dock's Quit and logout end the app through AppKit's
+    // macOS: Quit PAULGA CAD (Cmd+Q), the Dock's Quit and logout end the app through AppKit's
     // terminate, which would skip the unsaved-changes prompt (#2157). winit turns each into a
     // close request for the window instead, so it asks first, as the close button does.
     #[cfg(target_os = "macos")]
@@ -609,7 +611,7 @@ fn main() -> eframe::Result {
             // it, so nothing after `run_native` can be relied on there.
             app.services.at_exit = Some(Box::new(move || nightly_session::finish_once(&exit_watch, previous_unclean)));
             if previous_unclean {
-                app.set_status("CADCraft Nightly ended unexpectedly last time; your drawings were recovered where autosave had them.");
+                app.set_status("PAULGA CAD Nightly ended unexpectedly last time; your drawings were recovered where autosave had them.");
             }
             // File dialogs are sheets on macOS: a modal loop inside the event handler crashes the
             // app when the dialog is resized (#1527).
@@ -637,7 +639,7 @@ fn main() -> eframe::Result {
             #[cfg(target_os = "macos")]
             app.set_native_menus(vars.no_native_menu != Switch::On);
             if let Some(error) = &workspace_error {
-                eprintln!("CADCraft workspace: {error}");
+                eprintln!("PAULGA CAD workspace: {error}");
                 app.set_status(error);
             }
             app.system_languages = vars.locale.map(|s| vec![s]).unwrap_or_else(|| sys_locale::get_locales().collect());
@@ -654,10 +656,7 @@ fn main() -> eframe::Result {
             // Autosave files (SAVEFILEPATH) default to `<settings dir>/autosave`.
             if let Some(dir) = &vars.config_dir {
                 app.enable_autosave(&dir.join("autosave"));
-                // A nightly build is updated by the Launcher, never by the app's own update check.
-                if !is_nightly() {
-                    app.enable_update_check();
-                }
+
                 // Startup LISP (acad.lsp, acaddoc.lsp) is read from `<settings>/support`; the
                 // folder is made so it is there to put them in.
                 let support = dir.join("support");
@@ -676,6 +675,18 @@ fn main() -> eframe::Result {
             if let Some(port) = control_port {
                 let rx = control_server::start(port, cc.egui_ctx.clone());
                 app = app.with_control(rx);
+            }
+            #[cfg(windows)]
+            {
+                // The PAULGA Studio connection: on unless the person switched it off in its panel.
+                let wanted = cc
+                    .storage
+                    .and_then(|s| s.get_string(cadcraft_ui_egui::PREFS_KEY))
+                    .and_then(|prefs| serde_json::from_str::<serde_json::Value>(&prefs).ok())
+                    .and_then(|prefs| prefs["studioConnect"].as_bool())
+                    .unwrap_or(true);
+                let link = cadcraft_ui_egui::studio::Link::new(wanted);
+                app = app.with_control(paulga_studio::start(cc.egui_ctx.clone(), link.clone())).with_studio(link);
             }
             if sample {
                 let _ = app.run("ui.sample", serde_json::json!({}));
@@ -824,7 +835,7 @@ mod tests {
     #[test]
     fn the_version_lines_name_the_app_and_its_channel() {
         let nightly = nightly_version_line();
-        assert_eq!(nightly, format!("CADCraft {} (nightly-v1)", super::built_version()));
+        assert_eq!(nightly, format!("PAULGA CAD {} (nightly-v1)", super::built_version()));
         assert!(!nightly.contains("Nightly "), "the version line must not rename the app: {nightly}");
         assert_eq!(version_string(), format!("cadcraft {}", cadcraft_engine::build_version()));
     }

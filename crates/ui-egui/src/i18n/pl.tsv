@@ -29,7 +29,7 @@
 	> Greater than	> Większe niż
 	A dimension style with this name already exists.	Styl wymiarowania o tej nazwie już istnieje.
 	About	O programie
-	About CADCraft	O programie CADCraft
+	About PAULGA CAD	O programie PAULGA CAD
 	Above	Nad
 	Above text	Nad tekstem
 	Absolute	Bezwzględne
@@ -122,7 +122,7 @@
 	ByBlock	ByBlock
 	ByColor	Według koloru
 	ByLayer	ByLayer
-	CADCraft Help	Pomoc CADCraft
+	PAULGA CAD Help	Pomoc PAULGA CAD
 	Cancel	Anuluj
 	Cartesian (x, y)	Kartezjańskie (x, y)
 	Center	Środek
@@ -691,7 +691,7 @@
 	Quick Select Properties	Właściwości szybkiego zaznaczania
 	Quick Select...	Szybkie zaznaczanie...
 	QuickCalc	Szybki kalkulator
-	Quit CADCraft	Zakończ CADCraft
+	Quit PAULGA CAD	Zakończ PAULGA CAD
 	Radians	Radiany
 	Radius	Promień
 	Raster Image	Obraz rastrowy
@@ -1146,7 +1146,7 @@
 	⌘↩ to finish	⌘↩ — zakończ
 	Drawing as bytes	Rysunek w postaci bajtów
 	Services	Usługi
-	Hide CADCraft	Ukryj CADCraft
+	Hide PAULGA CAD	Ukryj PAULGA CAD
 	Hide Others	Ukryj pozostałe
 	Accessibility	Dostępność
 	Show System Cursor	Pokaż kursor systemowy
@@ -1502,7 +1502,7 @@
 	Snap type	Typ skoku
 	A drawing opened from a file keeps that file's format.	Rysunek otwarty z pliku zachowuje format tego pliku.
 	An array that would create more objects than this is refused.	Szyk tworzący więcej obiektów niż dopuszczalna liczba zostanie odrzucony.
-	CADCraft keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	CADCraft zapisuje te preferencje, tryby przyciągania do obiektów i przełączniki rysunkowe na Twoim koncie użytkownika oraz przywraca je przy uruchomieniu.
+	PAULGA CAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	PAULGA CAD zapisuje te preferencje, tryby przyciągania do obiektów i przełączniki rysunkowe na Twoim koncie użytkownika oraz przywraca je przy uruchomieniu.
 	Changes apply at once and are kept for next time.	Zmiany są stosowane natychmiast i zachowywane na przyszłość.
 	Command line history	Historia wiersza poleceń
 	Copy as JSON	Kopiuj jako JSON
@@ -1694,16 +1694,16 @@ menu	Dimension	Wymiarowanie
 	(1, 2, 4, 8, 16, 32, 64, 128, or 256)	(1, 2, 4, 8, 16, 32, 64, 128 lub 256)
 	<Offset>	<Offset>
 	>> Expression	>> Wyrażenie
-	A shortcut you give wins over CADCraft's own. Changes apply at once and are kept for next time.	Przypisany skrót zastępuje domyślny skrót CADCraft. Zmiany są stosowane od razu i zapamiętywane.
+	A shortcut you give wins over PAULGA CAD's own. Changes apply at once and are kept for next time.	Przypisany skrót zastępuje domyślny skrót PAULGA CAD. Zmiany są stosowane od razu i zapamiętywane.
 	Add…	Dodaj…
 	Alias	Alias
 	Alias file: {file}	Plik aliasów: {file}
-	Aliases are saved in your CADCraft profile and survive restarts.	Aliasy są zapisywane w profilu CADCraft i zachowywane po ponownym uruchomieniu.
+	Aliases are saved in your PAULGA CAD profile and survive restarts.	Aliasy są zapisywane w profilu PAULGA CAD i zachowywane po ponownym uruchomieniu.
 	Analyze Shapes	Analizuj kształty
 	Analyze Usage	Analizuj użycie
 	Associate the hatch with the new boundary?	Powiązać kreskowanie z nową obwiednią?
 	Associative dimension priority	Priorytet wymiarowania skojarzonego
-	Back to CADCraft's shortcut	Przywróć domyślny skrót CADCraft
+	Back to PAULGA CAD's shortcut	Przywróć domyślny skrót PAULGA CAD
 	Backup copies are off, so the current file will be replaced.	Kopie zapasowe są wyłączone, więc bieżący plik zostanie zastąpiony.
 	Backup copy	Kopia zapasowa
 	Block Description...	Opis bloku...
@@ -1711,7 +1711,7 @@ menu	Dimension	Wymiarowanie
 	Breakline extension distance	Długość przedłużenia linii przerwania
 	Breakline symbol size	Rozmiar symbolu linii przerwania
 	Bring to front	Przenieś na wierzch
-	CADCraft is up to date.	CADCraft jest aktualny.
+	PAULGA CAD is up to date.	PAULGA CAD jest aktualny.
 	Change	Zmień
 	Change Properties	Zmień właściwości
 	Check for Updates…	Sprawdź aktualizacje…

@@ -131,7 +131,7 @@ impl Session {
             }
             return Err(EngineError::UnknownCommand(typed.to_string()));
         };
-        if let Some(why) = crate::file_access::commands::refusal(spec.id) {
+        if let Some(why) = crate::file_access::commands::refusal(spec.id).or_else(|| self.lisp_script_refusal(spec.id)) {
             return Err(EngineError::Disabled(spec.id.into(), why));
         }
         if transparent && spec.transparent && self.running.is_some() {

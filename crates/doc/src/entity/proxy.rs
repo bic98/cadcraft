@@ -6,7 +6,7 @@
 //!
 //! The picture becomes ordinary, read-only entities: drawn and measured like the contents of a
 //! block, with layer 0, ByBlock colour, linetype and lineweight standing for the proxy's own
-//! until a chunk sets them. Chunks CADCraft doesn't decode (meshes, shells, lightweight
+//! until a chunk sets them. Chunks PAULGA CAD doesn't decode (meshes, shells, lightweight
 //! polylines, materials) are skipped.
 
 use super::{Arc, Circle, Common, Ellipse, Entity, EntityKind, Handle, Hatch, HatchLoop, Line, Lineweight, LwPolyline, Text, Unknown};
@@ -40,7 +40,7 @@ impl Unknown {
     /// newer files), cut to that size. An ACAD_PROXY_ENTITY holds them in its proxy data: the size
     /// group is the first after the `AcDbProxyEntity` subclass marker (from the start in a record
     /// without one), so a 92 or 160 among the entity's own groups before it isn't taken for it.
-    /// An entity of another type CADCraft keeps as read holds them in its `AcDbEntity` part when
+    /// An entity of another type PAULGA CAD keeps as read holds them in its `AcDbEntity` part when
     /// it was saved with a picture of itself (a LARGE_RADIAL_DIMENSION or an ARC_DIMENSION, or an
     /// object of another application; #3438). Empty for an entity without graphics and for one
     /// whose data isn't hex.
@@ -65,9 +65,9 @@ impl Unknown {
 }
 
 impl Unknown {
-    /// The `*D` block a dimension CADCraft keeps as read names (group 2 of its `AcDbDimension`
+    /// The `*D` block a dimension PAULGA CAD keeps as read names (group 2 of its `AcDbDimension`
     /// part): a LARGE_RADIAL_DIMENSION or an ARC_DIMENSION. AutoCAD draws a dimension from that
-    /// block, so CADCraft draws it from there too, and saving keeps it (#3438, #1161). `None`
+    /// block, so PAULGA CAD draws it from there too, and saving keeps it (#3438, #1161). `None`
     /// for other records.
     pub fn dimension_block(&self) -> Option<&str> {
         let m = self.tags.iter().position(|t| t.code == 100 && t.value.trim() == "AcDbDimension")?;

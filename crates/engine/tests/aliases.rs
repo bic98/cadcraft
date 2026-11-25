@@ -178,7 +178,7 @@ fn a_full_file_validates_lines_before_stopping_at_the_next_valid_definition() {
         json!([
             format!("line {}: ZZP00000: unknown command *NO_SUCH_1933; skipped", MAX_ALIASES + 2),
             format!("line {}: LINE is a command name; it stays the command; skipped", MAX_ALIASES + 3),
-            format!("line {}: ZZEXTERNAL is an external command; CADCraft doesn't run programs from alias files", MAX_ALIASES + 4),
+            format!("line {}: ZZEXTERNAL is an external command; PAULGA CAD doesn't run programs from alias files", MAX_ALIASES + 4),
             format!("line {}: `malformed` is not ALIAS, *COMMAND; skipped", MAX_ALIASES + 5),
             format!("line {}: more than {MAX_ALIASES} aliases; the rest are skipped", MAX_ALIASES + 6)
         ])

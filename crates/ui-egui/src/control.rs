@@ -237,6 +237,7 @@ const METHODS: &[(&str, &str, &str)] = &[
     ("app.open", "{path}", "Open a drawing."),
     ("app.save", "{path?}", "Save the drawing (Save As with a path)."),
     ("app.quit", "", "Quit without the unsaved-changes prompt."),
+    ("studio.tool", "{name, parameters?, expectedRuntimeDocumentId?}", "Run a PAULGA Studio tool (get-capabilities lists them)."),
     ("control.methods", "", "This list."),
     ("ping", "", "Replies \"pong\"."),
 ];
@@ -315,6 +316,17 @@ pub fn handle(app: &mut CadApp, ctx: &egui::Context, req: &ControlRequest) -> Ou
     out
 }
 
+/// Run one control method for a caller already on the UI thread. A screenshot needs a presented
+/// frame, so it is not one of them.
+pub(crate) fn call(app: &mut CadApp, ctx: &egui::Context, method: &str, params: Value) -> Result<Value, String> {
+    let (request, _reply) = ControlRequest::new(method, params);
+    match handle_request(app, ctx, &request) {
+        Outcome::Done(v) if v["ok"] == true => Ok(v["result"].clone()),
+        Outcome::Done(v) => Err(v["error"].as_str().unwrap_or("failed").to_string()),
+        Outcome::Screenshot { .. } => Err(format!("{method} cannot run here")),
+    }
+}
+
 fn handle_request(app: &mut CadApp, ctx: &egui::Context, req: &ControlRequest) -> Outcome {
     let p = &req.params;
     let s = |k: &str| p.get(k).and_then(Value::as_str);
@@ -381,6 +393,8 @@ fn handle_request(app: &mut CadApp, ctx: &egui::Context, req: &ControlRequest) -
         "cmdline.state" => ok(cmdline_state(app)),
         "engine.commands" => ok(all_commands(app)),
         "drawing.inspect" | "document.inspect" => wrap(app.session.execute("drawing.inspect", p).map_err(|e| e.to_string())),
+        // A tool PAULGA Studio asked for, run by the host's connection ([`crate::studio`]).
+        "studio.tool" => wrap(crate::studio::tools::call(app, ctx, p)),
         "ui.inspect" => ok(inspect(app, ctx)),
         "ui.elements" => ok(elements(ctx, p)),
         "ui.focus" => {

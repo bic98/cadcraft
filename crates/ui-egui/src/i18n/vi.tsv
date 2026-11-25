@@ -51,7 +51,7 @@
 	> Greater than	> Lớn hơn
 	A variable name starts with a letter and has only letters, digits and _	Tên biến bắt đầu bằng một chữ cái và chỉ gồm chữ cái, chữ số và _
 	About	Giới thiệu
-	About CADCraft	Giới thiệu CADCraft
+	About PAULGA CAD	Giới thiệu PAULGA CAD
 	Absolute	Tuyệt đối
 	Add Leader	Thêm đường dẫn ghi chú
 	Additional angles	Các góc bổ sung
@@ -113,7 +113,7 @@
 	ByBlock	ByBlock
 	ByColor	ByColor
 	ByLayer	ByLayer
-	CADCraft Help	Trợ giúp CADCraft
+	PAULGA CAD Help	Trợ giúp PAULGA CAD
 	Cancel	Hủy
 	Cartesian (x, y)	Đề-các (x, y)
 	Center	Tâm
@@ -702,7 +702,7 @@
 	Quick Select...	Chọn nhanh...
 	QuickCalc	QuickCalc
 	QuickCalc Pick	Chọn QuickCalc
-	Quit CADCraft	Thoát CADCraft
+	Quit PAULGA CAD	Thoát PAULGA CAD
 	Radius	Bán kính
 	Raster Image	Ảnh raster
 	Ray	Tia
@@ -933,7 +933,7 @@
 	Specify insertion point	Chỉ định điểm chèn
 	A drawing opened from a file keeps that file's format.	Bản vẽ mở từ một tệp sẽ giữ nguyên định dạng của tệp đó.
 	An array that would create more objects than this is refused.	Mảng tạo nhiều đối tượng hơn mức này sẽ bị từ chối.
-	CADCraft keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	CADCraft lưu các tùy chọn này, chế độ bắt điểm và các chế độ hỗ trợ vẽ cho tài khoản người dùng của bạn, rồi khôi phục khi khởi động.
+	PAULGA CAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	PAULGA CAD lưu các tùy chọn này, chế độ bắt điểm và các chế độ hỗ trợ vẽ cho tài khoản người dùng của bạn, rồi khôi phục khi khởi động.
 	Changes apply at once and are kept for next time.	Thay đổi có hiệu lực ngay và được giữ lại cho lần sau.
 	Command line history	Lịch sử dòng lệnh
 	Copy as JSON	Sao chép dưới dạng JSON
@@ -1179,7 +1179,7 @@
 @plural	{n} contributor	{n} người đóng góp
 	Drawing as bytes	Bản vẽ dưới dạng byte
 	Services	Dịch vụ
-	Hide CADCraft	Ẩn CADCraft
+	Hide PAULGA CAD	Ẩn PAULGA CAD
 	Hide Others	Ẩn các ứng dụng khác
 	Accessibility	Trợ năng
 	Show System Cursor	Hiển thị con trỏ hệ thống
@@ -1213,7 +1213,7 @@
 	X	X
 	Y	Y
 	B	B
-	CADCraft	CADCraft
+	PAULGA CAD	PAULGA CAD
 	More toolbar commands	Thêm lệnh thanh công cụ
 menu	View	Xem
 menu	Draw	Vẽ
@@ -1225,7 +1225,7 @@ menu	Modify	Hiệu chỉnh
 	Query Texts	Truy vấn chữ
 	Analyze Shapes	Phân tích hình dạng
 	Check for Updates…	Kiểm tra cập nhật…
-	CADCraft is up to date.	CADCraft đã là phiên bản mới nhất.
+	PAULGA CAD is up to date.	PAULGA CAD đã là phiên bản mới nhất.
 	Could not check for updates.	Không thể kiểm tra cập nhật.
 	3D Mouse	Chuột 3D
 	3D Mouse Navigation	Điều hướng chuột 3D

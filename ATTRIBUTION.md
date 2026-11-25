@@ -31,28 +31,30 @@ Generated-in-code assets are original and have no file to list:
 | `krilla 0.8.2 / icc/sGrey-v4.icc` (dependency-embedded) | Clinton Ingram | [craft-libs 9f89fe8 vendor/krilla/icc/sGrey-v4.icc](https://github.com/storytold/craft-libs/blob/9f89fe8f6d72ab4db4cc06f186381a6a254463ab/vendor/krilla/icc/sGrey-v4.icc) (Krilla 0.8.2 upstream 3ffdf0588cf98050aad6edba51ca70162e1fb5b5) | CC0-1.0 | Embedded by the pinned PDF writer (`craft-pdf` 0.1.0, Krilla 0.8.2); unmodified dependency asset, no file copied into this repository. SHA-256 `00c0f94e09127520a17dc0e1d9264b5702081d96dbdb1549ee88e3631ce42a9d`. |
 | `krilla 0.8.2 / icc/sRGB-v2-magic.icc` (dependency-embedded) | Clinton Ingram | [craft-libs 9f89fe8 vendor/krilla/icc/sRGB-v2-magic.icc](https://github.com/storytold/craft-libs/blob/9f89fe8f6d72ab4db4cc06f186381a6a254463ab/vendor/krilla/icc/sRGB-v2-magic.icc) (Krilla 0.8.2 upstream 3ffdf0588cf98050aad6edba51ca70162e1fb5b5) | CC0-1.0 | Embedded by the pinned PDF writer (`craft-pdf` 0.1.0, Krilla 0.8.2); unmodified dependency asset, no file copied into this repository. SHA-256 `af4efe28f6d311799865f325ba39184a2e978b113ca74124d60af7de22b105f4`. |
 | `krilla 0.8.2 / icc/sRGB-v4.icc` (dependency-embedded) | Clinton Ingram | [craft-libs 9f89fe8 vendor/krilla/icc/sRGB-v4.icc](https://github.com/storytold/craft-libs/blob/9f89fe8f6d72ab4db4cc06f186381a6a254463ab/vendor/krilla/icc/sRGB-v4.icc) (Krilla 0.8.2 upstream 3ffdf0588cf98050aad6edba51ca70162e1fb5b5) | CC0-1.0 | Embedded by the pinned PDF writer (`craft-pdf` 0.1.0, Krilla 0.8.2); unmodified dependency asset, no file copied into this repository. SHA-256 `c56e1685d888f5edb92fe07f2750f387f8fe8e91b32ff8fb0b56bfbbb9458353`. |
-| `assets/app-icon/hicolor/128x128/apps/ai.storyteller.cadcraft.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | Linux hicolor icon |
-| `assets/app-icon/hicolor/16x16/apps/ai.storyteller.cadcraft.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | Linux hicolor icon |
-| `assets/app-icon/hicolor/24x24/apps/ai.storyteller.cadcraft.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | Linux hicolor icon |
-| `assets/app-icon/hicolor/256x256/apps/ai.storyteller.cadcraft.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | Linux hicolor icon |
-| `assets/app-icon/hicolor/32x32/apps/ai.storyteller.cadcraft.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | Linux hicolor icon |
-| `assets/app-icon/hicolor/48x48/apps/ai.storyteller.cadcraft.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | Linux hicolor icon |
-| `assets/app-icon/hicolor/512x512/apps/ai.storyteller.cadcraft.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | Linux hicolor icon |
-| `assets/app-icon/hicolor/64x64/apps/ai.storyteller.cadcraft.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | Linux hicolor icon |
-| `assets/app-icon/cadcraft.icns` | CADCraft contributors | generated (packaging/icons.sh) | MIT OR Apache-2.0 | macOS icon |
-| `assets/app-icon/cadcraft.ico` | CADCraft contributors | generated (packaging/icons.sh) | MIT OR Apache-2.0 | Windows icon |
-| `assets/app-icon/cadcraft-64.png` | CADCraft contributors | generated | MIT OR Apache-2.0 | |
-| `assets/app-icon/cadcraft-256.png` | CADCraft contributors | generated | MIT OR Apache-2.0 | |
-| `assets/app-icon/cadcraft-1024.png` | CADCraft contributors | generated | MIT OR Apache-2.0 | |
-| `assets/app-icon/cadcraft-macos-512.png` | CADCraft contributors | generated (macOS margin variant) | MIT OR Apache-2.0 | |
+| `docs/images/paulga-start.png` | PAULGA | Native Windows screenshot of this fork | PAULGA branding | Start page |
+| `assets/app-icon/hicolor/128x128/apps/ai.storyteller.cadcraft.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/hicolor/16x16/apps/ai.storyteller.cadcraft.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/hicolor/24x24/apps/ai.storyteller.cadcraft.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/hicolor/256x256/apps/ai.storyteller.cadcraft.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/hicolor/32x32/apps/ai.storyteller.cadcraft.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/hicolor/48x48/apps/ai.storyteller.cadcraft.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/hicolor/512x512/apps/ai.storyteller.cadcraft.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/hicolor/64x64/apps/ai.storyteller.cadcraft.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/cadcraft.icns` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/paulga-logo.svg` | PAULGA | PAULGA Studio public/paulga-logo.svg | PAULGA brand asset | Product mark |
+| `assets/app-icon/cadcraft.ico` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/cadcraft-64.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/cadcraft-256.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/cadcraft-1024.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `assets/app-icon/cadcraft-macos-512.png` | PAULGA | PAULGA Studio src-tauri/icons | PAULGA brand asset | |
+| `packaging/macos/dmg/background.svg` | PAULGA | PAULGA Studio mark and Finder installation arrow | PAULGA brand asset | |
+| `packaging/macos/dmg/background.tiff` | PAULGA | PAULGA Studio mark and Finder installation arrow | PAULGA brand asset | |
 | `assets/app-icon/README.md` | CADCraft contributors | original work for this repository | MIT OR Apache-2.0 | How each icon is generated and which mark each channel uses |
 | `assets/app-icon/cadcraft-nightly.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | Nightly mark: same glyph, deeper background `#0c657b`; the Linux nightly tar's icon |
 | `assets/app-icon/cadcraft-nightly-1024.png` | CADCraft contributors | generated from `assets/app-icon/cadcraft-1024.png` | MIT OR Apache-2.0 | 1024 master the nightly `.icns` is generated from |
 | `assets/app-icon/cadcraft-nightly.ico` | CADCraft contributors | generated from `assets/app-icon/cadcraft-nightly-1024.png` | MIT OR Apache-2.0 | Windows nightly icon (16–256 px entries) for `build.rs` |
 | `assets/app-icon/cadcraft-nightly.icns` | CADCraft contributors | generated from `assets/app-icon/cadcraft-nightly-1024.png` | MIT OR Apache-2.0 | macOS nightly bundle icon (`CFBundleIconFile cadcraft-nightly`) |
 | `assets/app-icon/nightly-provenance.json` | CADCraft contributors | original work for this repository | MIT OR Apache-2.0 | The exact background transform that produced the nightly set |
-| `packaging/macos/dmg/background.svg` | @XusBadia | original work for this repository (2026-10-08), "CADCraft macOS DMG window background"; derived from the CADCraft app icon (`assets/app-icon/`, referenced via `<image>`, not copied); text is outlined Inter / JetBrains Mono glyph paths (OFL fonts the project already uses); no third-party material modified | MIT OR Apache-2.0 (same as the code: `LICENSE-MIT`, `LICENSE-APACHE`) | Finder window background of the macOS DMG; `packaging/macos/dmg/generate.py` renders it to `background.tiff` (see `packaging/macos/dmg/README.md`) |
-| `packaging/macos/dmg/background.tiff` | @XusBadia | Rendered from `packaging/macos/dmg/background.svg` by `packaging/macos/dmg/generate.py` | MIT OR Apache-2.0 (same as the code: `LICENSE-MIT`, `LICENSE-APACHE`) | 1x + 2x HiDPI TIFF for the macOS DMG window; includes the app icon (see its row) and LittleCMS's built-in sRGB profile ("No copyright, use freely") |
 | `examples/apartment.dxf` | CADCraft contributors | sample drawing made with cadcraft-cli commands | MIT OR Apache-2.0 | Original |
 | `docs/images/ui-apartment.png` | CADCraft contributors | screenshot of CADCraft itself (examples/apartment.dxf) | MIT OR Apache-2.0 | Original; no Autodesk UI |
 | `docs/images/ui-layout.png` | CADCraft contributors | screenshot of CADCraft itself (a layout of examples/apartment.dxf) | MIT OR Apache-2.0 | Original; no Autodesk UI |
@@ -125,3 +127,5 @@ shared dependency. Their source and hashes are retained below; notices are in `N
 | `hayro-interpret 0.7.0 / assets/CGATS001Compat-v2-micro.icc` | Clinton Ingram (saucecontrol/Compact-ICC-Profiles) | https://github.com/storytold/pdfcraft/blob/7437bde378f43856eada40af25b983812e615e8a/vendor/hayro-interpret/assets/CGATS001Compat-v2-micro.icc | CC0-1.0 | `73e1ba37d2bad5bab2a964f40a9eed96209666efc067c3322626214bbef234a0` | Default CMYK colour conversion (pinned hayro-interpret) |
 | `hayro-cmap 0.1.0 / assets/cmaps.brotli` | Adobe | https://github.com/storytold/pdfcraft/blob/a2ec27b4775f53c40cad3456936d9406611e3a8d/vendor/hayro-cmap/assets/cmaps.brotli | BSD-3-Clause | `ddf37af521d904d5646c2fc37b2b7e912dc1b56f0d210190b61f598154758e46` | Character-code mapping tables required to read CJK PDFs. Non-visual dependency data; existing embedding unchanged |
 | `hayro-interpret 0.7.0 / src/font/generated/metrics.rs` | Adobe (Core 14 AFM metrics, PDF specification encodings); tables by The Hayro Authors | https://github.com/storytold/pdfcraft/blob/7437bde378f43856eada40af25b983812e615e8a/vendor/hayro-interpret/src/font/generated/metrics.rs | MIT OR Apache-2.0 | `2ec9e608573eda459de1e1d9bda3bb494315e36bee885acc88912a11fe0caa41` | Glyph widths and encodings for non-embedded standard fonts. Non-visual dependency data; existing embedding unchanged |
+
+PAULGA product marks and platform icons come from PAULGA Studio (public/paulga-logo.svg and src-tauri/icons), supplied by the fork owner.

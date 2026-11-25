@@ -61,7 +61,7 @@
 	> Greater than	> მეტია
 	A variable name starts with a letter and has only letters, digits and _	ცვლადის სახელი ასოთი იწყება და მხოლოდ ასოებს, ციფრებსა და _-ს შეიცავს
 	About	პროგრამის შესახებ
-	About CADCraft	CADCraft-ის შესახებ
+	About PAULGA CAD	PAULGA CAD-ის შესახებ
 	Absolute	აბსოლუტური
 	Add Leader	მიმთითებლის დამატება
 	Additional angles	დამატებითი კუთხეები
@@ -124,7 +124,7 @@
 	ByBlock	ბლოკის მიხედვით
 	ByColor	ფერის მიხედვით
 	ByLayer	შრის მიხედვით
-	CADCraft Help	CADCraft-ის დახმარება
+	PAULGA CAD Help	PAULGA CAD-ის დახმარება
 	Cancel	გაუქმება
 	Cartesian (x, y)	დეკარტული (x, y)
 	Center	ცენტრი
@@ -725,7 +725,7 @@
 	Quick Select...	სწრაფი მონიშვნა...
 	QuickCalc	სწრაფი კალკულატორი
 	QuickCalc Pick	სწრაფი კალკულატორი: არჩევა
-	Quit CADCraft	CADCraft-იდან გასვლა
+	Quit PAULGA CAD	PAULGA CAD-იდან გასვლა
 	Radius	რადიუსი
 	Raster Image	რასტრული გამოსახულება
 	Ray	სხივი
@@ -959,7 +959,7 @@
 	Specify insertion point	მიუთითეთ ჩასმის წერტილი
 	A drawing opened from a file keeps that file's format.	ფაილიდან გახსნილი ნახაზი ინარჩუნებს ამ ფაილის ფორმატს.
 	An array that would create more objects than this is refused.	მასივი, რომელიც ამაზე მეტ ობიექტს შექმნიდა, უარყოფილია.
-	CADCraft keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	CADCraft ინახავს ამ პარამეტრებს, ობიექტზე მიბმის რეჟიმებს და ხაზვის გადამრთველებს თქვენი მომხმარებლის ანგარიშისთვის და აღადგენს მათ გაშვებისას.
+	PAULGA CAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	PAULGA CAD ინახავს ამ პარამეტრებს, ობიექტზე მიბმის რეჟიმებს და ხაზვის გადამრთველებს თქვენი მომხმარებლის ანგარიშისთვის და აღადგენს მათ გაშვებისას.
 	Changes apply at once and are kept for next time.	ცვლილებები მაშინვე მოქმედებს და შემდეგი ჯერისთვისაც ინახება.
 	Command line history	ბრძანების სტრიქონის ისტორია
 	Copy as JSON	კოპირება JSON-ად
@@ -1234,7 +1234,7 @@
 @plural	{n} contributor	{n} მონაწილე
 	Drawing as bytes	ნახაზი ბაიტებად
 	Services	სერვისები
-	Hide CADCraft	CADCraft-ის დამალვა
+	Hide PAULGA CAD	PAULGA CAD-ის დამალვა
 	Hide Others	სხვების დამალვა
 	Accessibility	ხელმისაწვდომობა
 	Show System Cursor	სისტემის კურსორის ჩვენება
@@ -1421,10 +1421,10 @@
 	Customize	მორგება
 	Edit Command Aliases (PGP)...	ბრძანებების ფსევდონიმების რედაქტირება (PGP)...
 	Check for Updates…	განახლებების შემოწმება…
-	CADCraft is up to date.	CADCraft განახლებულია.
+	PAULGA CAD is up to date.	PAULGA CAD განახლებულია.
 	Could not check for updates.	განახლებების შემოწმება ვერ მოხერხდა.
 	B	B
-	CADCraft	CADCraft
+	PAULGA CAD	PAULGA CAD
 	X	X
 	Y	Y
 menu	Dimension	ზომების დატანა
@@ -1529,8 +1529,8 @@ menu	View	ხედი
 	Replaces the shortcut of {commands}	ჩაანაცვლებს ამ ბრძანებების მალსახმობს: {commands}
 	Needs Ctrl, Alt or a function key	საჭიროა Ctrl, Alt ან ფუნქციური კლავიში
 	Press the keys	დააჭირეთ კლავიშებს
-	Back to CADCraft's shortcut	CADCraft-ის მალსახმობზე დაბრუნება
-	A shortcut you give wins over CADCraft's own. Changes apply at once and are kept for next time.	თქვენ მიერ მინიჭებულ მალსახმობს უპირატესობა აქვს CADCraft-ის საკუთარზე. ცვლილებები მაშინვე მოქმედებს და შემდეგი ჯერისთვისაც ინახება.
+	Back to PAULGA CAD's shortcut	PAULGA CAD-ის მალსახმობზე დაბრუნება
+	A shortcut you give wins over PAULGA CAD's own. Changes apply at once and are kept for next time.	თქვენ მიერ მინიჭებულ მალსახმობს უპირატესობა აქვს PAULGA CAD-ის საკუთარზე. ცვლილებები მაშინვე მოქმედებს და შემდეგი ჯერისთვისაც ინახება.
 	Turned off, a right-click while a command runs does what Right-Click Customization sets for Command mode.	გამორთვისას ბრძანების შესრულების დროს მარჯვენა დაწკაპება იმას აკეთებს, რაც „მარჯვენა დაწკაპების მორგებაში“ ბრძანების რეჟიმისთვის არის არჩეული.
 	Right-Click Customization...	მარჯვენა დაწკაპების მორგება...
 	Right-Click Customization	მარჯვენა დაწკაპების მორგება
@@ -1550,7 +1550,7 @@ menu	View	ხედი
 	Shortcut Menu: always enabled	კონტექსტური მენიუ: ყოველთვის ჩართული
 	Shortcut Menu: enabled when command options are present	კონტექსტური მენიუ: ჩართული, როცა ბრძანებას ვარიანტები აქვს
 	Import: there is no file dialog here; run ALIASEDIT with the file's contents using its text parameter.	იმპორტი: აქ ფაილის არჩევის დიალოგი არ არის; გაუშვით ALIASEDIT და ფაილის შიგთავსი გადაეცით მის text პარამეტრს.
-	Aliases are saved in your CADCraft profile and survive restarts.	ფსევდონიმები თქვენს CADCraft-ის პროფილში ინახება და გადატვირთვის შემდეგაც რჩება.
+	Aliases are saved in your PAULGA CAD profile and survive restarts.	ფსევდონიმები თქვენს PAULGA CAD-ის პროფილში ინახება და გადატვირთვის შემდეგაც რჩება.
 	Import…	იმპორტი…
 	Run ALIASEDIT with the file's contents using its text parameter.	გაუშვით ALIASEDIT და ფაილის შიგთავსი გადაეცით მის text პარამეტრს.
 	Importing a file replaces your {n} aliases, and any changes not applied yet.	ფაილის იმპორტი ჩაანაცვლებს თქვენს ფსევდონიმებს ({n}) და ჯერ გამოუყენებელ ცვლილებებს.

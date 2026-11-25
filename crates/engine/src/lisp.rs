@@ -128,6 +128,9 @@ pub struct LispState {
     steps: RoutineSteps,
     /// Files loaded by APPLOAD, by name, for `(load name)` where there is no file system.
     files: HashMap<String, String>,
+    /// A script another program sent is running ([`Session::lisp_eval_script`]): it may not
+    /// leave its drawing.
+    pub(crate) script: bool,
     /// Where startup files are read from (see `startup.rs`).
     support_dir: Option<std::path::PathBuf>,
     /// Drawings that had their startup files.
@@ -258,6 +261,43 @@ impl Session {
     pub fn lisp_var(&self, name: &str) -> Value {
         let uid = self.state().map(|s| s.uid).unwrap_or(0);
         self.lisp.envs.get(&uid).map(|e| e.get(name)).unwrap_or_default()
+    }
+
+    /// Commands a script another program sent may not start: they open, close or switch drawings,
+    /// and the script was let in for the one that is open.
+    pub const SCRIPT_REFUSED: &'static [&'static str] = &["new", "open", "close", "closeall", "document.switch", "recover", "drawingrecovery"];
+
+    /// Why a running script may not start command `id`; `None` when it may, and outside a script.
+    pub(crate) fn lisp_script_refusal(&self, id: &str) -> Option<String> {
+        (self.lisp.script && Self::SCRIPT_REFUSED.contains(&id)).then(|| "a script from another program stays in the drawing it was sent to".to_string())
+    }
+
+    /// Evaluate a script another program sent, to the end, answering `get…` calls from `inputs`.
+    ///
+    /// It needs the automation roots in force ([`crate::file_access::confine`]), which hold its
+    /// file access to them. On top of that it may not open, close or switch drawings, and what it
+    /// defines (functions, `c:` commands, variables) is gone when it ends: nothing it leaves can
+    /// run later with the person's own access.
+    pub fn lisp_eval_script(&mut self, src: &str, inputs: Vec<Value>) -> crate::Result<Option<std::result::Result<Value, String>>> {
+        if crate::file_access::current().is_none() {
+            return Err(crate::EngineError::Other("a script runs only inside the automation roots".into()));
+        }
+        let uid = self.state()?.uid;
+        let before = self.lisp.envs.get(&uid).map(|env| env.globals.clone());
+        self.lisp.script = true;
+        let result = self.lisp_eval(src, false, true, inputs);
+        self.lisp.script = false;
+        match before {
+            Some(globals) => {
+                if let Some(env) = self.lisp.envs.get_mut(&uid) {
+                    env.globals = globals;
+                }
+            }
+            None => {
+                self.lisp.envs.remove(&uid);
+            }
+        }
+        result
     }
 
     /// Evaluate LISP source (a command-line expression or a file's contents). `print`: show the

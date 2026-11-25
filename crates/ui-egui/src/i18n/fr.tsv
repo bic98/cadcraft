@@ -28,7 +28,7 @@
 	= Equals	= Égal à
 	> Greater than	> Supérieur à
 	About	À propos
-	About CADCraft	À propos de CADCraft
+	About PAULGA CAD	À propos de PAULGA CAD
 	Absolute	Absolu
 	Add Leader	Ajouter un repère
 	Align	Aligner
@@ -84,7 +84,7 @@
 	ByBlock	DuBloc
 	ByColor	Par couleur
 	ByLayer	DuCalque
-	CADCraft Help	Aide de CADCraft
+	PAULGA CAD Help	Aide de PAULGA CAD
 	Cancel	Annuler
 	Cartesian (x, y)	Cartésien (x, y)
 	Center	Centre
@@ -590,7 +590,7 @@
 	Quick Select Properties	Propriétés de la sélection rapide
 	Quick Select...	Sélection rapide...
 	QuickCalc	Calculatrice rapide
-	Quit CADCraft	Quitter CADCraft
+	Quit PAULGA CAD	Quitter PAULGA CAD
 	Radius	Rayon
 	Raster Image	Image raster
 	Ray	Rayon
@@ -998,7 +998,7 @@
 @plural	{n} contributor	{n} contributeur|{n} contributeurs
 	Drawing as bytes	Dessin sous forme d'octets
 	Services	Services
-	Hide CADCraft	Masquer CADCraft
+	Hide PAULGA CAD	Masquer PAULGA CAD
 	Hide Others	Masquer les autres
 	Accessibility	Accessibilité
 	Show System Cursor	Afficher le curseur système
@@ -1013,7 +1013,7 @@
 	Query Texts	Interroger les textes
 	Analyze Shapes	Analyser les formes
 	Check for Updates…	Rechercher des mises à jour…
-	CADCraft is up to date.	CADCraft est à jour.
+	PAULGA CAD is up to date.	PAULGA CAD est à jour.
 	Could not check for updates.	Impossible de rechercher les mises à jour.
 	Add a drawing file as a block library	Ajouter un fichier de dessin comme bibliothèque de blocs
 	Add a folder of drawings or a drawing file to use its blocks.	Ajoutez un dossier de dessins ou un fichier de dessin pour utiliser ses blocs.
@@ -1063,8 +1063,8 @@
 	Replaces the shortcut of {commands}	Remplace le raccourci de : {commands}
 	Needs Ctrl, Alt or a function key	Il faut Ctrl, Alt ou une touche de fonction
 	Press the keys	Appuyez sur les touches
-	Back to CADCraft's shortcut	Revenir au raccourci de CADCraft
-	A shortcut you give wins over CADCraft's own. Changes apply at once and are kept for next time.	Un raccourci que vous définissez l'emporte sur celui de CADCraft. Les modifications s'appliquent tout de suite et sont conservées.
+	Back to PAULGA CAD's shortcut	Revenir au raccourci de PAULGA CAD
+	A shortcut you give wins over PAULGA CAD's own. Changes apply at once and are kept for next time.	Un raccourci que vous définissez l'emporte sur celui de PAULGA CAD. Les modifications s'appliquent tout de suite et sont conservées.
 
 # ArtCraft feature naming
 	Additional Tools	Outils supplémentaires
