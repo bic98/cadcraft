@@ -912,6 +912,15 @@ fn visuals(theme: Theme) -> Visuals {
     v
 }
 
+/// The theme the window's frame is asked for: the one shown, or the OS's own for a System choice.
+fn window_theme(theme: Theme, follow_system: bool) -> egui::SystemTheme {
+    match (follow_system, theme) {
+        (true, _) => egui::SystemTheme::SystemDefault,
+        (false, Theme::Dark) => egui::SystemTheme::Dark,
+        (false, Theme::Light) => egui::SystemTheme::Light,
+    }
+}
+
 /// Install the styles of both themes and show `theme` (egui's own widgets, popups and menus
 /// follow it; our own painting follows [`Tokens::get`]). `follow_system` is true for the
 /// [`ThemePref::System`] choice, whose `theme` was resolved from the OS report.
@@ -922,6 +931,11 @@ pub fn apply(ctx: &egui::Context, theme: Theme, follow_system: bool) {
     // A System choice keeps egui's own System preference: a concrete Light/Dark would pin the native
     // window appearance (winit then stops reporting OS changes) and the app would never follow again.
     ctx.set_theme(if follow_system { egui::ThemePreference::System } else { egui::ThemePreference::from(theme) });
+    // The window's own frame (Windows' title bar and its buttons) in the theme shown: without it
+    // Windows set to light apps draws a light title bar over the dark app, and the title and the
+    // buttons can't be read. A System choice leaves the frame to the OS, which still reports its
+    // changes.
+    ctx.send_viewport_cmd(egui::ViewportCommand::SetTheme(window_theme(theme, follow_system)));
     ctx.all_styles_mut(|s| {
         s.spacing.item_spacing = egui::vec2(6.0, 4.0);
         s.spacing.button_padding = egui::vec2(6.0, 3.0);
@@ -935,6 +949,16 @@ pub fn apply(ctx: &egui::Context, theme: Theme, follow_system: bool) {
 
 #[cfg(test)]
 mod tests {
+    /// Windows' title bar takes the theme the app shows, so a dark app never sits under a light
+    /// title bar whose white title can't be read; a System choice leaves it to the OS.
+    #[test]
+    fn the_window_frame_takes_the_theme_shown() {
+        use egui::{SystemTheme, Theme};
+        assert_eq!(super::window_theme(Theme::Dark, false), SystemTheme::Dark);
+        assert_eq!(super::window_theme(Theme::Light, false), SystemTheme::Light);
+        assert_eq!(super::window_theme(Theme::Dark, true), SystemTheme::SystemDefault);
+    }
+
     /// An empty font file found first doesn't hide a readable one after it: the CJK, Arabic and
     /// Japanese fonts are kept only when [`super::read_capped`] can take them.
     #[cfg(not(target_arch = "wasm32"))]
