@@ -219,7 +219,7 @@ pub fn open_panel(app: &mut CadApp) -> Result<Value, String> {
 
 /// Window ▸ PAULGA Studio: close the panel when it is shown, else open it.
 pub fn toggle_panel(app: &mut CadApp) -> Result<Value, String> {
-    if app.ui.docking.layout.contains(&crate::docking::Panel::Studio) {
+    if app.ui.docking.layout().contains(&crate::docking::Panel::Studio) {
         crate::docking::command(app, false, &panel_json("close"))
     } else {
         open_panel(app)
@@ -243,7 +243,7 @@ pub fn status(app: &CadApp) -> Value {
         "toolsRun": s.tools_run,
         "lastTool": s.last_tool,
         "document": { "name": s.document.name, "path": s.document.path, "runtimeDocumentId": s.document.runtime_id },
-        "panelOpen": app.ui.docking.layout.contains(&crate::docking::Panel::Studio),
+        "panelOpen": app.ui.docking.layout().contains(&crate::docking::Panel::Studio),
     })
 }
 
@@ -337,7 +337,7 @@ mod tests {
     fn the_panel_opens_and_closes_from_its_window_menu_command() {
         let mut app = app();
         app.run("new", json!({})).unwrap();
-        let shown = |app: &CadApp| app.ui.docking.layout.contains(&crate::docking::Panel::Studio);
+        let shown = |app: &CadApp| app.ui.docking.layout().contains(&crate::docking::Panel::Studio);
         assert!(!shown(&app));
         app.run("ui.toggle.studio", json!({})).unwrap();
         assert!(shown(&app));

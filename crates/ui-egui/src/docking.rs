@@ -546,6 +546,7 @@ impl PanelGlyph {
         static PROPERTIES: PanelGlyph = PanelGlyph(Icon::Properties);
         static EXTERNAL_REFS: PanelGlyph = PanelGlyph(Icon::Attach);
         static BLOCKS: PanelGlyph = PanelGlyph(Icon::Blocks);
+        static STUDIO: PanelGlyph = PanelGlyph(Icon::Share);
         match panel {
             Panel::Canvas => None,
             Panel::ToolSets => Some(&TOOL_SETS),
@@ -554,6 +555,8 @@ impl PanelGlyph {
             Panel::Properties => Some(&PROPERTIES),
             Panel::ExternalRefs => Some(&EXTERNAL_REFS),
             Panel::Blocks => Some(&BLOCKS),
+            // The PAULGA Studio connection panel.
+            Panel::Studio => Some(&STUDIO),
         }
     }
 }
