@@ -5,6 +5,7 @@
 //! connection is wanted and which drawing is open, writes back how the connection is doing, and
 //! runs each tool Studio asks for on the UI thread through the control method `studio.tool`.
 
+pub mod exchange;
 pub mod panel;
 pub mod tools;
 

@@ -129,6 +129,28 @@ pub const TOOLS: &[Tool] = &[
         &[("command", "string", "Command id or alias, e.g. `line`, `circle`, `layer.new`."), ("params", "object", "The command's parameters.")],
     ),
     change("undo", "system", "medium", "Undo the last change, or the last `count` changes.", &[("count", "integer", "Steps to undo (default 1).")]),
+    read(
+        "export-selected-mesh",
+        "object",
+        "Export selected objects (or the whole drawing) as a PAULGA Send Mode mesh bundle.",
+        &[
+            ("scope", "string", "`selection-only`, `selection-or-all` (default), or `all`."),
+            ("ids", "array", "Optional object handles to export directly."),
+            ("bundleFilePath", "string", "Optional file path to write the bundle JSON to."),
+        ],
+    ),
+    change(
+        "import-mesh-bundle",
+        "object",
+        "medium",
+        "Import a PAULGA Send Mode mesh bundle (curves, meshes, points, texts) into the open drawing as one undo step.",
+        &[
+            ("bundle", "object", "Inline Send Mode bundle JSON."),
+            ("bundleFilePath", "string", "Path to a Send Mode bundle JSON file."),
+            ("bundleFilePaths", "array", "Chunked Send Mode bundle JSON file paths."),
+            ("targetLayer", "string", "Optional layer name to place imported objects on."),
+        ],
+    ),
     Tool {
         name: "execute-script",
         access: Access::Script,
@@ -247,6 +269,8 @@ fn run(app: &mut CadApp, ctx: &egui::Context, name: &str, p: &Value) -> Result<V
         "apply-layer-visibility" => layer_visibility(app, p),
         "run-command" => run_command(app, p),
         "undo" => app.run("undo", json!({ "count": p.get("count").and_then(Value::as_u64).unwrap_or(1).clamp(1, 1000) })),
+        "export-selected-mesh" => super::exchange::export_selected_mesh(app, p),
+        "import-mesh-bundle" => super::exchange::import_mesh_bundle(app, p),
         "execute-script" => script(app, p),
         other => Err(format!("UNSUPPORTED_TOOL: {other}")),
     }
@@ -778,5 +802,35 @@ mod tests {
         assert_eq!(context["documents"].as_array().unwrap().len(), 1);
         assert!(context["document"]["title"].is_string());
         assert!(context["document"].get("layers").is_none(), "layers come from query-buckets");
+    }
+
+    #[test]
+    fn mesh_bundle_round_trips_lines_circles_and_external_meshes() {
+        let mut src = app();
+        tool(&mut src, "run-command", json!({ "command": "line", "params": { "points": [[0, 0], [100, 0]] } })).unwrap();
+        tool(&mut src, "run-command", json!({ "command": "circle", "params": { "center": [50, 50], "radius": 25 } })).unwrap();
+        let exported = tool(&mut src, "export-selected-mesh", json!({ "scope": "all" })).unwrap();
+        assert_eq!(exported["exportedCount"], 2);
+        let bundle = exported["bundle"].clone();
+        assert_eq!(bundle["curves"].as_array().unwrap().len(), 2);
+
+        let mut dst = app();
+        let imported = tool(&mut dst, "import-mesh-bundle", json!({ "bundle": bundle })).unwrap();
+        assert_eq!(imported["importedCount"], 2);
+        assert_eq!(tool(&mut dst, "query-entities", json!({})).unwrap()["count"], 2);
+        // Undo rolls back the entire import in one step.
+        tool(&mut dst, "undo", json!({})).unwrap();
+        assert_eq!(tool(&mut dst, "query-entities", json!({})).unwrap()["count"], 0);
+
+        // External 3D mesh (e.g. from Rhino/Blender) also imports cleanly.
+        let ext = json!({
+            "schemaVersion": "3.1",
+            "units": "mm",
+            "meshes": [{ "id": "m1", "layerName": "RhinoWall", "vertices": [0,0,0, 10,0,0, 10,10,0], "indices": [0,1,2] }],
+            "curves": []
+        });
+        let imp2 = tool(&mut dst, "import-mesh-bundle", json!({ "bundle": ext })).unwrap();
+        assert_eq!(imp2["meshCount"], 1);
+        assert_eq!(tool(&mut dst, "query-entities", json!({})).unwrap()["count"], 1);
     }
 }
