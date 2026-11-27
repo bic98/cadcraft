@@ -317,6 +317,9 @@ pub struct CadApp {
     control_rx: Vec<Receiver<ControlRequest>>,
     /// The PAULGA Studio connection the host attached ([`studio`]); `None` where there is none.
     pub studio: Option<std::sync::Arc<studio::Link>>,
+    /// What the PAULGA Studio button does on this host ([`studio::open`]); `None` where the button
+    /// opens Studio's website.
+    pub(crate) studio_open: Option<studio::Opener>,
     /// Fresh surface and identity snapshot (see [`capture`]).
     pub(crate) capture_geometry: Option<capture::CaptureGeometry>,
     /// Monotonic surface epoch, bumped whenever the window/viewport geometry changes.
@@ -423,6 +426,7 @@ impl CadApp {
             integrated_titlebar: false,
             control_rx: Vec::new(),
             studio: None,
+            studio_open: None,
             capture_geometry: None,
             capture_epoch: 0,
             capture_identity_epoch: 0,
@@ -621,6 +625,12 @@ impl CadApp {
     /// Attach the host's PAULGA Studio connection, so the panel and `studio.*` commands reach it.
     pub fn with_studio(mut self, link: std::sync::Arc<studio::Link>) -> Self {
         self.studio = Some(link);
+        self
+    }
+
+    /// What the PAULGA Studio button does on this host: bring Studio forward or start it.
+    pub fn with_studio_opener(mut self, open: studio::Opener) -> Self {
+        self.studio_open = Some(open);
         self
     }
 

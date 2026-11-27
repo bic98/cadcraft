@@ -687,6 +687,8 @@ fn main() -> eframe::Result {
                     .unwrap_or(true);
                 let link = cadcraft_ui_egui::studio::Link::new(wanted);
                 app = app.with_control(paulga_studio::start(cc.egui_ctx.clone(), link.clone())).with_studio(link);
+                // The PAULGA Studio button, which needs no connection.
+                app = app.with_studio_opener(Box::new(paulga_studio::open_studio));
             }
             if sample {
                 let _ = app.run("ui.sample", serde_json::json!({}));

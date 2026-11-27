@@ -1295,6 +1295,8 @@ menu	Modify	수정
 
 # PAULGA Studio connection
 	PAULGA Studio	PAULGA Studio
+	Show PAULGA Studio, or start it	PAULGA Studio 창을 앞으로 가져오거나 실행합니다
+	PAULGA Studio could not be started	PAULGA Studio를 실행하지 못했습니다
 	Connect to PAULGA Studio	PAULGA Studio에 연결
 	Disconnect from PAULGA Studio	PAULGA Studio 연결 끊기
 	PAULGA Studio Connection Status	PAULGA Studio 연결 상태

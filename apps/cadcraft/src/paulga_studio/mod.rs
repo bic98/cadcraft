@@ -9,7 +9,10 @@
 //! [`Link::snapshot`] and reports back through [`Link::report`].
 
 mod bridge;
+mod open;
 mod wire;
+
+pub(crate) use open::open_studio;
 
 use std::net::{Ipv4Addr, SocketAddrV4, TcpStream};
 use std::os::windows::process::CommandExt;

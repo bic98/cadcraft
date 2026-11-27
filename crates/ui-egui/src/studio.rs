@@ -247,6 +247,26 @@ pub fn status(app: &CadApp) -> Value {
     })
 }
 
+/// Studio's website, which the PAULGA Studio button opens where Studio is not installed.
+pub const WEBSITE: &str = "https://studio.paulga.com";
+
+/// What the PAULGA Studio button does on the host: `Ok(true)` when Studio's window came forward or
+/// Studio was started, `Ok(false)` when Studio is not installed on this computer.
+pub type Opener = Box<dyn Fn() -> Result<bool, String>>;
+
+/// The PAULGA Studio button: Studio's window comes forward, or Studio starts. Where Studio is not
+/// installed, and on a host without that action, its website opens instead.
+pub fn open(app: &mut CadApp, ctx: &egui::Context) {
+    match app.studio_open.as_ref().map(|open| open()) {
+        Some(Ok(true)) => {}
+        Some(Err(error)) => {
+            log::warn!("{error}");
+            app.set_status(crate::tl!("PAULGA Studio could not be started"));
+        }
+        Some(Ok(false)) | None => ctx.open_url(egui::OpenUrl::new_tab(WEBSITE)),
+    }
+}
+
 /// What a build without the connection says (the web build, and desktops Studio does not run on).
 pub const UNAVAILABLE: &str = "The PAULGA Studio connection is part of the Windows desktop app.";
 
@@ -277,6 +297,40 @@ mod tests {
 
     fn app() -> CadApp {
         CadApp::new(Session::empty(), crate::Services::default())
+    }
+
+    /// The URLs a frame in which `act` runs asks the system to open.
+    fn opened(app: &mut CadApp, act: impl FnOnce(&mut CadApp, &egui::Context)) -> Vec<String> {
+        let ctx = egui::Context::default();
+        let mut act = Some(act);
+        let mut out = ctx.run_ui(egui::RawInput::default(), |ui| {
+            if let Some(act) = act.take() {
+                act(app, ui.ctx());
+            }
+        });
+        // No renderer takes the frame's textures here.
+        out.textures_delta.clear();
+        out.platform_output
+            .commands
+            .into_iter()
+            .filter_map(|command| match command {
+                egui::OutputCommand::OpenUrl(open) => Some(open.url),
+                _ => None,
+            })
+            .collect()
+    }
+
+    #[test]
+    fn the_studio_button_opens_studio_and_its_website_only_where_studio_is_not_installed() {
+        let mut app = app();
+        assert_eq!(opened(&mut app, open), [WEBSITE], "a host without the action");
+        app = app.with_studio_opener(Box::new(|| Ok(false)));
+        assert_eq!(opened(&mut app, open), [WEBSITE], "Studio is not installed");
+        app = app.with_studio_opener(Box::new(|| Ok(true)));
+        assert!(opened(&mut app, open).is_empty() && app.status.is_none(), "Studio came forward: nothing else happens");
+        app = app.with_studio_opener(Box::new(|| Err("access denied".into())));
+        assert!(opened(&mut app, open).is_empty());
+        assert_eq!(app.status.as_ref().map(|(message, _)| message.as_str()), Some("PAULGA Studio could not be started"));
     }
 
     #[test]

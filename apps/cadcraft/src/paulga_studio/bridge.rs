@@ -101,6 +101,22 @@ pub(super) fn find(root: &Path, excluded: &[String]) -> Option<Bridge> {
     files(root).iter().filter_map(|path| read(path)).filter_map(|info| parse(&info)).filter(|bridge| !excluded.contains(&bridge.instance)).max_by(|a, b| a.updated.cmp(&b.updated))
 }
 
+/// The process ids of the Studios under `root` that have not marked themselves as exited, the one
+/// that wrote its file last first: whether or not they listen for this program.
+pub(super) fn desktop_pids(root: &Path) -> Vec<u32> {
+    let mut running: Vec<(String, u32)> = files(root)
+        .iter()
+        .filter_map(|path| read(path))
+        .filter(|info| !info.get("shutdownIntent").is_some_and(|v| !v.is_null() && v != ""))
+        .filter_map(|info| {
+            let pid = info.get("desktopPid").and_then(Value::as_u64).and_then(|pid| u32::try_from(pid).ok()).filter(|pid| *pid != 0)?;
+            Some((text(&info, "updatedAt").unwrap_or_default(), pid))
+        })
+        .collect();
+    running.sort_by(|a, b| b.0.cmp(&a.0));
+    running.into_iter().map(|(_, pid)| pid).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -168,6 +184,24 @@ mod tests {
         gone["shutdownIntent"] = json!("user_exit");
         std::fs::write(older.join("bridge.json"), gone.to_string()).unwrap();
         assert!(!studio_without_listener(&root), "a Studio that exited is not one that needs an update");
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn the_running_studios_are_those_that_did_not_say_they_exited_freshest_first() {
+        let root = std::env::temp_dir().join(format!("paulga-bridge-pids-{}-{:?}", std::process::id(), std::thread::current().id()));
+        let write = |app: &str, info: Value| {
+            let dir = root.join("@paulga").join(app);
+            std::fs::create_dir_all(&dir).unwrap();
+            std::fs::write(dir.join("bridge.json"), info.to_string()).unwrap();
+        };
+        // One that listens for other programs only still counts: the button needs no connection.
+        write("older", json!({ "desktopPid": 11, "updatedAt": "2026-11-25T01:00:00.000Z", "status": {} }));
+        write("studio", json!({ "desktopPid": 22, "updatedAt": "2026-11-25T02:00:00.000Z" }));
+        write("gone", json!({ "desktopPid": 33, "updatedAt": "2026-11-25T03:00:00.000Z", "shutdownIntent": "user_exit" }));
+        write("broken", json!({ "desktopPid": 0 }));
+        assert_eq!(desktop_pids(&root), [22, 11]);
+        assert_eq!(desktop_pids(&root.join("missing")), Vec::<u32>::new());
         let _ = std::fs::remove_dir_all(&root);
     }
 }

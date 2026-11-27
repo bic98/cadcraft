@@ -46,6 +46,8 @@ const TOOLBAR: &[&[(Icon, &str, &str, Option<&str>)]] = &[
 const MAC_TITLE_BAR: f32 = 28.0;
 /// The width of the toolbar's More button.
 const MORE_WIDTH: f32 = 30.0;
+/// The room between the tool groups and the PAULGA Studio button at the row's end.
+const STUDIO_GAP: f32 = 12.0;
 
 /// Title row (with the integrated macOS title bar) and the Tool Bar.
 pub fn title_and_toolbar(app: &mut CadApp, ui: &mut egui::Ui) {
@@ -75,7 +77,23 @@ pub fn title_and_toolbar(app: &mut CadApp, ui: &mut egui::Ui) {
             let mut clicked = None;
             let mac = ui.ctx().os().is_mac();
             let widths: Vec<_> = TOOLBAR.iter().map(|group| group.len() as f32 * (size + 6.0) - 6.0).collect();
-            let available = (row.right() - 12.0 - x).max(0.0);
+            // The PAULGA Studio button, at the row's far end (the window's top right, under the OS's title bar): the
+            // tool groups fit in what it leaves. A row too narrow for it and the More button goes without it.
+            let room = (row.right() - 12.0 - x).max(0.0);
+            let studio_text = ui.painter().layout_no_wrap(crate::tl!("PAULGA Studio").to_string(), crate::theme::body(), t.text);
+            let studio_w = studio_text.size().x + 16.0;
+            let studio = (room - studio_w - STUDIO_GAP >= MORE_WIDTH)
+                .then(|| Rect::from_min_size(pos2(row.right() - 12.0 - studio_w, row.center().y - 11.0), vec2(studio_w, 22.0)));
+            let available = if studio.is_some() { room - studio_w - STUDIO_GAP } else { room };
+            if let Some(br) = studio {
+                let resp = ui.interact(br, ui.scope_id().with("tb_studio"), Sense::click());
+                ui.painter().rect_filled(br, 3.0, if resp.hovered() { t.control_hover } else { t.control });
+                ui.painter().galley(pos2(br.left() + 8.0, br.center().y - studio_text.size().y / 2.0), studio_text, t.text);
+                icons::describe_control(ui, &resp, "PAULGA Studio", None, false);
+                if resp.on_hover_text(crate::tl!("Show PAULGA Studio, or start it")).clicked() {
+                    crate::studio::open(app, ui.ctx());
+                }
+            }
             let items: Vec<_> = widths.iter().enumerate().map(|(i, w)| FitItem::new(*w, i as u16, FitKeep::Free)).collect();
             let fit = craft_behavior::fit::fit_items(&items, available, 24.0, 24.0, MORE_WIDTH);
             if !fit.overflow.is_empty() && available < MORE_WIDTH {
