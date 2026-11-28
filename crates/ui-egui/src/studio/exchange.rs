@@ -110,16 +110,18 @@ fn resolve_entities<'a>(app: &'a CadApp, p: &Value) -> Result<(Vec<&'a Entity>, 
     let doc = &state.doc;
     let scope = p.get("scope").and_then(Value::as_str).unwrap_or("selection-or-all");
 
-    let explicit_ids: Vec<Handle> = p
-        .get("ids")
-        .and_then(Value::as_array)
-        .map(|arr| {
-            arr.iter()
-                .filter_map(Value::as_str)
-                .filter_map(Handle::parse_hex)
-                .collect()
-        })
-        .unwrap_or_default();
+    // `handlesFile`: Studio's selection id file (ids_file.rs), for a card of any number of objects.
+    let explicit_ids: Vec<Handle> = match p.get("handlesFile").and_then(Value::as_str) {
+        Some(raw) => {
+            let ids = super::ids_file::read_ids(&super::ids_file::existing_file(raw)?)?;
+            ids.iter().filter_map(|id| Handle::parse_hex(id)).collect()
+        }
+        None => p
+            .get("ids")
+            .and_then(Value::as_array)
+            .map(|arr| arr.iter().filter_map(Value::as_str).filter_map(Handle::parse_hex).collect())
+            .unwrap_or_default(),
+    };
 
     let handles: Vec<Handle> = if !explicit_ids.is_empty() {
         explicit_ids
@@ -139,6 +141,38 @@ fn resolve_entities<'a>(app: &'a CadApp, p: &Value) -> Result<(Vec<&'a Entity>, 
         .filter_map(|h| doc.model.get(h).map(std::sync::Arc::as_ref))
         .collect();
     Ok((entities, selected_count))
+}
+
+/// `get-selection` with `idsFilePath`: the selection written into Studio's new id file (handle, layer,
+/// the layer's colour from `layer_colours`), answered with counts only: a selection of any size.
+pub fn capture_selection_ids(app: &CadApp, raw: &str, layer_colours: &std::collections::HashMap<String, String>) -> Result<Value, String> {
+    let path = super::ids_file::new_file(raw)?;
+    let state = app.session.state().map_err(|e| e.to_string())?;
+    let mut rows: Vec<(String, String, String)> = Vec::with_capacity(state.selection.len());
+    let mut layers: Vec<(String, usize)> = Vec::new();
+    let mut seen: HashSet<Handle> = HashSet::new();
+    for handle in &state.selection {
+        let Some(entity) = state.doc.model.get(*handle) else { continue };
+        if !seen.insert(*handle) {
+            continue;
+        }
+        let layer = entity.common.layer.as_str().to_string();
+        match layers.iter_mut().find(|(name, _)| *name == layer) {
+            Some((_, count)) => *count += 1,
+            None => layers.push((layer.clone(), 1)),
+        }
+        let colour = layer_colours.get(&layer).cloned().unwrap_or_default();
+        rows.push((entity.handle.hex(), layer, colour));
+    }
+    super::ids_file::write(&path, super::PLATFORM, &rows)?;
+    let document_path = state.path.clone();
+    let document_name = document_path.as_deref().and_then(|p| Path::new(p).file_name()).map(|n| n.to_string_lossy().into_owned());
+    Ok(json!({
+        "count": rows.len(),
+        "layers": layers.iter().map(|(name, count)| json!({ "name": name, "count": count, "colorHex": layer_colours.get(name) })).collect::<Vec<_>>(),
+        "documentName": document_name,
+        "documentPath": document_path,
+    }))
 }
 
 pub fn export_selected_mesh(app: &mut CadApp, p: &Value) -> Result<Value, String> {

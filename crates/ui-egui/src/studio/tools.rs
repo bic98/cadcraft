@@ -69,7 +69,11 @@ pub const TOOLS: &[Tool] = &[
         "get-selection",
         "object",
         "Handles of the selected objects; with `geometry`, their layers and geometry too.",
-        &[("geometry", "boolean", "Also return each object's layer and geometry (default false)."), ("limit", "integer", "Most objects returned with geometry (default 200).")],
+        &[
+            ("geometry", "boolean", "Also return each object's layer and geometry (default false)."),
+            ("limit", "integer", "Most objects returned with geometry (default 200)."),
+            ("idsFilePath", "string", "PAULGA Studio's new selection id file (software-snapshots/<uuid>.ids): the whole selection is written there and only counts are returned."),
+        ],
     ),
     read(
         "query-entities",
@@ -284,6 +288,8 @@ pub fn capabilities() -> Value {
         "cadVersion": cadcraft_engine::build_version(),
         "units": "drawing units",
         "supportsDocumentFence": true,
+        // get-selection writes Studio's selection id file and export-selected-mesh reads it (ids_file.rs).
+        "selectionIdsFileVersion": 1,
         "operations": operations,
     })
 }
@@ -488,6 +494,14 @@ fn page(p: &Value) -> u64 {
 }
 
 fn selection(app: &mut CadApp, p: &Value) -> Result<Value, String> {
+    // `idsFilePath`: the selection goes into Studio's id file, whatever its size; only counts come back.
+    if let Some(raw) = p.get("idsFilePath").and_then(Value::as_str) {
+        let colours: std::collections::HashMap<String, String> = layers(app)?
+            .iter()
+            .filter_map(|layer| Some((layer.get("name")?.as_str()?.to_string(), layer.get("colorRgb")?.as_str()?.to_string())))
+            .collect();
+        return super::exchange::capture_selection_ids(app, raw, &colours);
+    }
     let ids = app.session.summary().get("selection").cloned().unwrap_or_else(|| json!([]));
     let count = ids.as_array().map_or(0, Vec::len);
     let mut out = json!({ "selectedIds": ids, "selectedCount": count });
