@@ -286,7 +286,7 @@ pub fn export_selected_mesh(app: &mut CadApp, p: &Value) -> Result<Value, String
                     "sourceObjectNames": [handle],
                     "layerName": layer,
                     "vertices": verts,
-                    "indices": indices,
+                    "faces": indices,
                 }));
             }
             EntityKind::Solid(s) | EntityKind::Trace(s) => {
@@ -303,7 +303,7 @@ pub fn export_selected_mesh(app: &mut CadApp, p: &Value) -> Result<Value, String
                     "sourceObjectNames": [handle],
                     "layerName": layer,
                     "vertices": verts,
-                    "indices": [0, 1, 3, 0, 3, 2],
+                    "faces": [0, 1, 3, 0, 3, 2],
                 }));
             }
             EntityKind::PolyfaceMesh(pm) => {
@@ -336,7 +336,7 @@ pub fn export_selected_mesh(app: &mut CadApp, p: &Value) -> Result<Value, String
                         "sourceObjectNames": [handle],
                         "layerName": layer,
                         "vertices": verts,
-                        "indices": indices,
+                        "faces": indices,
                     }));
                 }
             }
@@ -425,6 +425,13 @@ fn skipped_json(objects: &[(&str, usize)], pieces: &[(&str, usize)]) -> Value {
 /// Bundle entries no receiver here can make: block instances and hatches.
 fn unsupported_entries(bundle: &Value) -> usize {
     ["instances", "hatches"].iter().filter_map(|key| bundle.get(*key).and_then(Value::as_array)).map(Vec::len).sum()
+}
+
+/// A mesh's triangle indices: `faces` in the shared bundle (AutoCAD, Rhino, SketchUp, Revit, Blender and
+/// Studio), or `indices` from a PAULGA app from before it wrote `faces` — it wrote and read only
+/// `indices`, so its meshes reached no other program and theirs never came in.
+fn mesh_faces(mesh: &Value) -> Option<&Vec<Value>> {
+    mesh.get("faces").or_else(|| mesh.get("indices")).and_then(Value::as_array)
 }
 
 fn load_bundles(p: &Value) -> Result<Vec<Value>, String> {
@@ -579,7 +586,7 @@ pub fn import_mesh_bundle(app: &mut CadApp, p: &Value) -> Result<Value, String> 
                 ensure_layer(app, &mut known_layers, layer);
 
                 let (Some(verts_arr), Some(idx_arr)) =
-                    (mesh.get("vertices").and_then(Value::as_array), mesh.get("indices").and_then(Value::as_array))
+                    (mesh.get("vertices").and_then(Value::as_array), mesh_faces(mesh))
                 else {
                     empty += 1;
                     continue;
@@ -638,8 +645,10 @@ pub fn import_mesh_bundle(app: &mut CadApp, p: &Value) -> Result<Value, String> 
                     continue;
                 };
                 let height = txt.get("height").and_then(Value::as_f64).unwrap_or(2.5).max(0.1);
-                let rotation = txt.get("rotation").and_then(Value::as_f64).unwrap_or(0.0);
-                if app.run("text", json!({ "position": pos, "text": content, "height": height, "rotation": rotation })).is_ok() {
+                // The bundle's rotation is in radians (AutoCAD's, and this program's own export); the
+                // `text` command takes `at` and degrees. It was given `position`, so no text ever came in.
+                let rotation = txt.get("rotation").and_then(Value::as_f64).unwrap_or(0.0).to_degrees();
+                if app.run("text", json!({ "at": pos, "text": content, "height": height, "rotation": rotation })).is_ok() {
                     text_count += 1;
                 } else {
                     failed += 1;

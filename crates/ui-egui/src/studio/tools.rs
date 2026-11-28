@@ -947,7 +947,7 @@ mod tests {
         let bundle = json!({
             "schemaVersion": "3.1", "units": "mm",
             "curves": [{ "points": [0,0,0, 10,0,0] }, { "points": [5,5,0] }],
-            "meshes": [{ "vertices": [0,0,0, 10,0,0, 10,10,0], "indices": triangles }],
+            "meshes": [{ "vertices": [0,0,0, 10,0,0, 10,10,0], "faces": triangles }],
             "instances": [{ "definitionId": "d1" }],
         });
         let imported = tool(&mut dst, "import-mesh-bundle", json!({ "bundle": bundle })).unwrap();
@@ -957,5 +957,23 @@ mod tests {
         assert_eq!(imported["skipped"]["byReason"], json!({ "unsupported": 1, "empty": 1 }));
         assert_eq!(imported["skipped"]["partialPieces"], 1);
         assert_eq!(imported["skipped"]["piecesByReason"], json!({ "limit": 1 }));
+    }
+
+    // Texts from AutoCAD (and this program's own export) never came in: `text` was given `position`
+    // for `at`, and radians for degrees.
+    #[test]
+    fn a_received_text_comes_in_where_and_turned_as_it_was_sent() {
+        let mut dst = app();
+        let bundle = json!({
+            "schemaVersion": "3.1", "units": "mm",
+            "texts": [{ "text": "STAIR B", "position": { "x": 120.0, "y": 40.0, "z": 0 }, "height": 3.8, "rotation": std::f64::consts::FRAC_PI_2 }],
+        });
+        let imported = tool(&mut dst, "import-mesh-bundle", json!({ "bundle": bundle })).unwrap();
+        assert_eq!((imported["textCount"].clone(), imported["skipped"]["count"].clone()), (json!(1), json!(0)));
+        let back = tool(&mut dst, "export-selected-mesh", json!({ "scope": "all" })).unwrap();
+        let text = &back["bundle"]["texts"][0];
+        assert_eq!(text["text"], "STAIR B");
+        assert_eq!((text["position"]["x"].clone(), text["position"]["y"].clone()), (json!(120.0), json!(40.0)));
+        assert!((text["rotation"].as_f64().unwrap() - std::f64::consts::FRAC_PI_2).abs() < 1e-9, "{text}");
     }
 }
