@@ -6,6 +6,7 @@
 //! runs each tool Studio asks for on the UI thread through the control method `studio.tool`.
 
 pub mod exchange;
+mod ids_file;
 pub mod panel;
 pub mod tools;
 
