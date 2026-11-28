@@ -13,6 +13,8 @@ use serde_json::{Map, Value, json};
 use crate::CadApp;
 
 const SCHEMA_VERSION: &str = "3.1";
+/// Triangles of one received mesh drawn as polylines; the rest is reported as left out.
+const MAX_MESH_TRIANGLES: usize = 5_000;
 
 #[derive(Default)]
 struct Bounds {
@@ -140,10 +142,14 @@ fn resolve_entities<'a>(app: &'a CadApp, p: &Value) -> Result<(Vec<&'a Entity>, 
 }
 
 pub fn export_selected_mesh(app: &mut CadApp, p: &Value) -> Result<Value, String> {
-    let (entities, selected_count) = resolve_entities(app, p)?;
+    let (entities, asked_count) = resolve_entities(app, p)?;
     if entities.is_empty() {
         return Err("NO_SELECTION: PAULGA CAD에 내보낼 객체가 없습니다".into());
     }
+    // Selected means found in the drawing: a handle that is not there is never counted as sent, so
+    // Studio refuses the transfer before anything reaches the target.
+    let selected_count = entities.len();
+    let missing_count = asked_count.saturating_sub(selected_count);
 
     let doc_name = app
         .session
@@ -375,10 +381,14 @@ pub fn export_selected_mesh(app: &mut CadApp, p: &Value) -> Result<Value, String
         bundle["bounds"] = bounds.to_json();
     }
 
+    // Objects found that carry nothing the bundle can hold (blocks, hatches, dimensions, images…).
+    let unsupported = selected_count - exported_count;
     let mut result = json!({
         "selectedElementCount": selected_count,
         "selectedCount": selected_count,
         "exportedCount": exported_count,
+        "missingHandleCount": missing_count,
+        "skipped": skipped_json(&[("unsupported", unsupported)], &[]),
         "stats": stats,
     });
     if bounds.any {
@@ -398,6 +408,23 @@ pub fn export_selected_mesh(app: &mut CadApp, p: &Value) -> Result<Value, String
     }
 
     Ok(result)
+}
+
+/// The shared transfer report's `skipped` block (Studio's transfer-report.ts): whole objects left
+/// out by reason, and objects that went in only in part by reason.
+fn skipped_json(objects: &[(&str, usize)], pieces: &[(&str, usize)]) -> Value {
+    let by = |list: &[(&str, usize)]| list.iter().filter(|(_, n)| *n > 0).map(|(reason, n)| (reason.to_string(), json!(n))).collect::<Map<String, Value>>();
+    json!({
+        "count": objects.iter().map(|(_, n)| n).sum::<usize>(),
+        "byReason": by(objects),
+        "partialPieces": pieces.iter().map(|(_, n)| n).sum::<usize>(),
+        "piecesByReason": by(pieces),
+    })
+}
+
+/// Bundle entries no receiver here can make: block instances and hatches.
+fn unsupported_entries(bundle: &Value) -> usize {
+    ["instances", "hatches"].iter().filter_map(|key| bundle.get(*key).and_then(Value::as_array)).map(Vec::len).sum()
 }
 
 fn load_bundles(p: &Value) -> Result<Vec<Value>, String> {
@@ -496,12 +523,20 @@ pub fn import_mesh_bundle(app: &mut CadApp, p: &Value) -> Result<Value, String> 
         .map(|d| d.header.str("CLAYER", "0").to_string());
 
     let (mut curve_count, mut mesh_count, mut point_count, mut text_count) = (0usize, 0usize, 0usize, 0usize);
+    // What the bundle held, and why what did not go in stayed out (the transfer report's counts).
+    let mut given = 0usize;
+    let (mut unsupported, mut empty, mut failed) = (0usize, 0usize, 0usize);
+    let (mut over_limit, mut part_failed) = (0usize, 0usize);
 
     app.run("undo", json!({ "mode": "begin" }))?;
 
     for bundle in &bundles {
+        let skipped_kinds = unsupported_entries(bundle);
+        given += skipped_kinds;
+        unsupported += skipped_kinds;
         if let Some(curves) = bundle.get("curves").and_then(Value::as_array) {
             for curve in curves {
+                given += 1;
                 let layer = target_layer.or_else(|| curve.get("layerName").and_then(Value::as_str)).unwrap_or("0");
                 ensure_layer(app, &mut known_layers, layer);
 
@@ -520,14 +555,18 @@ pub fn import_mesh_bundle(app: &mut CadApp, p: &Value) -> Result<Value, String> 
 
                 let pts = curve.get("points").map(parse_curve_points).unwrap_or_default();
                 let closed = curve.get("closed").and_then(Value::as_bool).unwrap_or(false);
-                if pts.len() == 2 && !closed {
-                    if app.run("line", json!({ "points": pts })).is_ok() {
-                        curve_count += 1;
-                    }
+                let made = if pts.len() == 2 && !closed {
+                    app.run("line", json!({ "points": pts })).is_ok()
                 } else if pts.len() >= 2 {
-                    if app.run("pline", json!({ "vertices": pts, "closed": closed })).is_ok() {
-                        curve_count += 1;
-                    }
+                    app.run("pline", json!({ "vertices": pts, "closed": closed })).is_ok()
+                } else {
+                    empty += 1;
+                    continue;
+                };
+                if made {
+                    curve_count += 1;
+                } else {
+                    failed += 1;
                 }
             }
         }
@@ -535,57 +574,75 @@ pub fn import_mesh_bundle(app: &mut CadApp, p: &Value) -> Result<Value, String> 
         // 3D meshes from Rhino / SketchUp / Revit / Blender: project each triangle into 2D polylines.
         if let Some(meshes) = bundle.get("meshes").and_then(Value::as_array) {
             for mesh in meshes {
+                given += 1;
                 let layer = target_layer.or_else(|| mesh.get("layerName").and_then(Value::as_str)).unwrap_or("0");
                 ensure_layer(app, &mut known_layers, layer);
 
-                let Some(verts_arr) = mesh.get("vertices").and_then(Value::as_array) else { continue };
-                let Some(idx_arr) = mesh.get("indices").and_then(Value::as_array) else { continue };
+                let (Some(verts_arr), Some(idx_arr)) =
+                    (mesh.get("vertices").and_then(Value::as_array), mesh.get("indices").and_then(Value::as_array))
+                else {
+                    empty += 1;
+                    continue;
+                };
                 let verts: Vec<[f64; 2]> = verts_arr
                     .chunks_exact(3)
                     .filter_map(|c| Some([c[0].as_f64()?, c[1].as_f64()?]))
                     .collect();
                 let indices: Vec<usize> = idx_arr.iter().filter_map(|v| v.as_u64().map(|n| n as usize)).collect();
-                let mut added_any = false;
-                for tri in indices.chunks_exact(3).take(5_000) {
+                let (mut drawn, mut refused) = (0usize, 0usize);
+                for tri in indices.chunks_exact(3).take(MAX_MESH_TRIANGLES) {
                     let (Some(&a), Some(&b), Some(&c)) = (verts.get(tri[0]), verts.get(tri[1]), verts.get(tri[2])) else {
                         continue;
                     };
                     if app.run("pline", json!({ "vertices": [a, b, c], "closed": true })).is_ok() {
-                        added_any = true;
+                        drawn += 1;
+                    } else {
+                        refused += 1;
                     }
                 }
-                if added_any {
-                    mesh_count += 1;
+                if drawn == 0 {
+                    if refused > 0 { failed += 1 } else { empty += 1 }
+                    continue;
+                }
+                mesh_count += 1;
+                // Each triangle is a polyline here: past the limit the rest of the mesh stays out.
+                if indices.len() / 3 > MAX_MESH_TRIANGLES {
+                    over_limit += 1;
+                } else if refused > 0 {
+                    part_failed += 1;
                 }
             }
         }
 
         if let Some(points) = bundle.get("points").and_then(Value::as_array) {
             for pt in points {
+                given += 1;
                 let layer = target_layer.or_else(|| pt.get("layerName").and_then(Value::as_str)).unwrap_or("0");
                 ensure_layer(app, &mut known_layers, layer);
-                if let Some(pos) = pt.get("position").and_then(parse_point_2d) {
-                    if app.run("point", json!({ "point": pos })).is_ok() {
-                        point_count += 1;
-                    }
+                match pt.get("position").and_then(parse_point_2d) {
+                    Some(pos) if app.run("point", json!({ "point": pos })).is_ok() => point_count += 1,
+                    Some(_) => failed += 1,
+                    None => empty += 1,
                 }
             }
         }
 
         if let Some(texts) = bundle.get("texts").and_then(Value::as_array) {
             for txt in texts {
+                given += 1;
                 let layer = target_layer.or_else(|| txt.get("layerName").and_then(Value::as_str)).unwrap_or("0");
                 ensure_layer(app, &mut known_layers, layer);
                 let content = txt.get("text").and_then(Value::as_str).unwrap_or("");
-                if content.is_empty() {
+                let Some(pos) = txt.get("position").and_then(parse_point_2d).filter(|_| !content.is_empty()) else {
+                    empty += 1;
                     continue;
-                }
-                if let Some(pos) = txt.get("position").and_then(parse_point_2d) {
-                    let height = txt.get("height").and_then(Value::as_f64).unwrap_or(2.5).max(0.1);
-                    let rotation = txt.get("rotation").and_then(Value::as_f64).unwrap_or(0.0);
-                    if app.run("text", json!({ "position": pos, "text": content, "height": height, "rotation": rotation })).is_ok() {
-                        text_count += 1;
-                    }
+                };
+                let height = txt.get("height").and_then(Value::as_f64).unwrap_or(2.5).max(0.1);
+                let rotation = txt.get("rotation").and_then(Value::as_f64).unwrap_or(0.0);
+                if app.run("text", json!({ "position": pos, "text": content, "height": height, "rotation": rotation })).is_ok() {
+                    text_count += 1;
+                } else {
+                    failed += 1;
                 }
             }
         }
@@ -598,8 +655,13 @@ pub fn import_mesh_bundle(app: &mut CadApp, p: &Value) -> Result<Value, String> 
 
     let imported_count = curve_count + mesh_count + point_count + text_count;
     Ok(json!({
+        "sourceCount": given,
         "importedCount": imported_count,
         "createdCount": imported_count,
+        "skipped": skipped_json(
+            &[("unsupported", unsupported), ("empty", empty), ("create-failed", failed)],
+            &[("limit", over_limit), ("create-failed", part_failed)],
+        ),
         "curveCount": curve_count,
         "meshCount": mesh_count,
         "pointCount": point_count,

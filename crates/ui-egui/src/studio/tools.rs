@@ -929,4 +929,33 @@ mod tests {
         assert_eq!(imp2["meshCount"], 1);
         assert_eq!(tool(&mut dst, "query-entities", json!({})).unwrap()["count"], 1);
     }
+
+    // Studio's agent transfer compares these counts: a handle not in the drawing was counted as sent,
+    // and the receiver said neither how many it was given nor what it left out.
+    #[test]
+    fn mesh_exchange_counts_what_was_found_given_and_left_out() {
+        let mut src = app();
+        tool(&mut src, "run-command", json!({ "command": "line", "params": { "points": [[0, 0], [100, 0]] } })).unwrap();
+        let handle = tool(&mut src, "query-entities", json!({})).unwrap()["entities"][0]["handle"].clone();
+        let exported = tool(&mut src, "export-selected-mesh", json!({ "scope": "selection-only", "ids": [handle, "FFFFFF"] })).unwrap();
+        assert_eq!(exported["selectedCount"], 1, "the missing handle is not counted as selected");
+        assert_eq!(exported["missingHandleCount"], 1);
+        assert_eq!(exported["skipped"]["count"], 0);
+
+        let mut dst = app();
+        let triangles: Vec<u32> = (0..5_001u32).flat_map(|_| [0, 1, 2]).collect();
+        let bundle = json!({
+            "schemaVersion": "3.1", "units": "mm",
+            "curves": [{ "points": [0,0,0, 10,0,0] }, { "points": [5,5,0] }],
+            "meshes": [{ "vertices": [0,0,0, 10,0,0, 10,10,0], "indices": triangles }],
+            "instances": [{ "definitionId": "d1" }],
+        });
+        let imported = tool(&mut dst, "import-mesh-bundle", json!({ "bundle": bundle })).unwrap();
+        assert_eq!(imported["sourceCount"], 4);
+        assert_eq!(imported["importedCount"], 2);
+        assert_eq!(imported["skipped"]["count"], 2);
+        assert_eq!(imported["skipped"]["byReason"], json!({ "unsupported": 1, "empty": 1 }));
+        assert_eq!(imported["skipped"]["partialPieces"], 1);
+        assert_eq!(imported["skipped"]["piecesByReason"], json!({ "limit": 1 }));
+    }
 }
