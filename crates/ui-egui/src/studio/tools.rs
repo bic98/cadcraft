@@ -48,6 +48,24 @@ pub const TOOLS: &[Tool] = &[
     read("get-capabilities", "system", "List the tools PAULGA CAD runs for PAULGA Studio.", &[]),
     read("get-context", "document", "The open drawings and the active one: name, path, space, current layer, extents, view, object counts.", &[]),
     read(
+        "inspect-drawing",
+        "document",
+        "Full summary of the active drawing: entity counts, extents, layers, styles, blocks, layouts, selection, undo history.",
+        &[("entities", "boolean", "Include entities with handles and geometry (default false)."), ("limit", "integer", "Most entities returned.")],
+    ),
+    read(
+        "find-text",
+        "data",
+        "Find texts in the drawing (TEXT, MTEXT, block attributes, multileaders) filtered by substring, layer, or window.",
+        &[
+            ("contains", "string", "Case-insensitive substring filter."),
+            ("layer", "string", "Optional layer filter."),
+            ("window", "array", "Optional [[x0,y0],[x1,y1]] window in drawing units."),
+            ("limit", "integer", "Page size (default 200)."),
+            ("offset", "integer", "Items to skip."),
+        ],
+    ),
+    read(
         "get-selection",
         "object",
         "Handles of the selected objects; with `geometry`, their layers and geometry too.",
@@ -122,6 +140,58 @@ pub const TOOLS: &[Tool] = &[
         &[("states", "array", "[{name, visible}] for the layers to change."), ("showAll", "boolean", "Show every layer.")],
     ),
     change(
+        "new-drawing",
+        "document",
+        "medium",
+        "Create a new drawing (metric or imperial).",
+        &[("metric", "boolean", "Use metric units (default true).")],
+    ),
+    change(
+        "open-document",
+        "document",
+        "medium",
+        "Open a DXF or DWG drawing from disk.",
+        &[("path", "string", "Absolute path to the DXF/DWG file.")],
+    ),
+    change(
+        "save-document",
+        "document",
+        "medium",
+        "Save the drawing (DXF/DWG) or export to SVG/PNG/PDF by extension.",
+        &[("path", "string", "Destination file path.")],
+    ),
+    change(
+        "place-image",
+        "object",
+        "medium",
+        "Attach/place a raster image (PNG/JPEG/BMP/TIFF) into the drawing (`imageattach`).",
+        &[
+            ("path", "string", "Absolute path to the image file."),
+            ("at", "array", "Lower-left insertion point [x, y] (default [0, 0])."),
+            ("scale", "number", "Scale factor (default 1)."),
+            ("width", "number", "Optional width in drawing units (instead of `scale`)."),
+            ("rotation", "number", "Optional rotation in degrees."),
+            ("name", "string", "Optional image reference name."),
+        ],
+    ),
+    change(
+        "command-line",
+        "system",
+        "high",
+        "Run one AutoCAD-style command line input, e.g. `line 0,0 10,0 10,5 c`, `circle 5,2.5 1`, `zoom e`.",
+        &[("text", "string", "Command-line input text.")],
+    ),
+    change(
+        "run-batch",
+        "system",
+        "high",
+        "Run a multi-line AutoCAD `.scr` command script (one or more inputs per line) or JSON `steps` array.",
+        &[
+            ("text", "string", "Multi-line `.scr` command text."),
+            ("steps", "array", "Alternative: array of `{command, params}` objects."),
+        ],
+    ),
+    change(
         "run-command",
         "system",
         "high",
@@ -129,6 +199,8 @@ pub const TOOLS: &[Tool] = &[
         &[("command", "string", "Command id or alias, e.g. `line`, `circle`, `layer.new`."), ("params", "object", "The command's parameters.")],
     ),
     change("undo", "system", "medium", "Undo the last change, or the last `count` changes.", &[("count", "integer", "Steps to undo (default 1).")]),
+    change("redo", "system", "medium", "Redo the last undone change, or the last `count` changes.", &[("count", "integer", "Steps to redo (default 1).")]),
+    change("cancel", "system", "low", "Cancel the active command or clear the selection (Escape).", &[]),
     read(
         "export-selected-mesh",
         "object",
@@ -258,6 +330,8 @@ fn run(app: &mut CadApp, ctx: &egui::Context, name: &str, p: &Value) -> Result<V
     match name {
         "get-capabilities" => Ok(capabilities()),
         "get-context" => Ok(context(app)),
+        "inspect-drawing" => app.run("drawing.inspect", p.clone()),
+        "find-text" => app.run("texts", p.clone()),
         "get-selection" => selection(app, p),
         "query-entities" => entities(app, p),
         "query-buckets" => buckets(app, p),
@@ -267,13 +341,35 @@ fn run(app: &mut CadApp, ctx: &egui::Context, name: &str, p: &Value) -> Result<V
         "frame-objects" => frame(app, p),
         "select" => select(app, p),
         "apply-layer-visibility" => layer_visibility(app, p),
+        "new-drawing" => app.run("new", p.clone()),
+        "open-document" => crate::control::call(app, ctx, "app.open", p.clone()),
+        "save-document" => crate::control::call(app, ctx, "app.save", p.clone()),
+        "place-image" => app.run("imageattach", p.clone()),
+        "command-line" => crate::control::call(app, ctx, "cmdline.input", p.clone()),
+        "run-batch" => run_batch(app, ctx, p),
         "run-command" => run_command(app, p),
         "undo" => app.run("undo", json!({ "count": p.get("count").and_then(Value::as_u64).unwrap_or(1).clamp(1, 1000) })),
+        "redo" => app.run("redo", json!({ "count": p.get("count").and_then(Value::as_u64).unwrap_or(1).clamp(1, 1000) })),
+        "cancel" => crate::control::call(app, ctx, "cmdline.key", json!({ "key": "escape" })),
         "export-selected-mesh" => super::exchange::export_selected_mesh(app, p),
         "import-mesh-bundle" => super::exchange::import_mesh_bundle(app, p),
         "execute-script" => script(app, p),
         other => Err(format!("UNSUPPORTED_TOOL: {other}")),
     }
+}
+
+fn run_batch(app: &mut CadApp, ctx: &egui::Context, p: &Value) -> Result<Value, String> {
+    if let Some(steps) = p.get("steps").and_then(Value::as_array) {
+        let mut results = Vec::new();
+        for (idx, step) in steps.iter().take(100).enumerate() {
+            match run_command(app, step) {
+                Ok(res) => results.push(res),
+                Err(error) => return Ok(json!({ "completed": idx, "failed": { "step": idx, "error": error }, "results": results })),
+            }
+        }
+        return Ok(json!({ "completed": results.len(), "failed": Value::Null, "results": results }));
+    }
+    crate::control::call(app, ctx, "cmdline.script", p.clone())
 }
 
 /// Whether the request may run a script: `scriptAuthorization` must be Studio's, for this very
